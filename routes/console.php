@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\DB;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Generar alertas de tiempo excedido cada dia a medianoche
+Schedule::call(function () {
+    DB::statement('CALL generar_alertas_tiempo()');
+})->daily()->name('generar-alertas');
