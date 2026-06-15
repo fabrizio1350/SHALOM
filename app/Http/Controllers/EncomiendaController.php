@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Encomienda;
 use App\Models\Zona;
+use App\DataStructures\AlertQueue;
+use App\DataStructures\HistorialStack;
+use App\DataStructures\ClasificacionTree;
 
 class EncomiendaController extends Controller
 {
@@ -40,6 +43,11 @@ class EncomiendaController extends Controller
             'descripcion'    => 'nullable|string'
         ]);
 
+        // Usar ClasificacionTree para clasificar el paquete
+        $tree     = new ClasificacionTree();
+        $categoria = $tree->clasificar($request->peso, $request->dimensiones ?? '');
+        $estante   = $tree->asignarEstante($request->peso, $request->dimensiones ?? '');
+
         // Llamar al procedimiento PL/pgSQL
         DB::statement('CALL registrar_encomienda(?, ?, ?, ?, ?, ?, ?)', [
             $request->remitente,
@@ -51,7 +59,8 @@ class EncomiendaController extends Controller
             Auth::id()
         ]);
 
-        return redirect()->route('encomiendas.index')->with('success', 'Encomienda registrada correctamente.');
+        return redirect()->route('encomiendas.index')
+               ->with('success', "Encomienda registrada — Categoría: $categoria, Estante: $estante");
     }
 
     // Ver detalle de encomienda
@@ -60,9 +69,21 @@ class EncomiendaController extends Controller
         $encomienda = Encomienda::with('zona')->findOrFail($id);
 
         // Obtener historial via función PL/pgSQL
-        $historial = DB::select('SELECT * FROM obtener_historial_encomienda(?)', [$id]);
+        $historialRaw = DB::select('SELECT * FROM obtener_historial_encomienda(?)', [$id]);
 
-        return view('encomiendas.ver', compact('encomienda', 'historial'));
+        // Usar HistorialStack para ordenar más reciente primero
+        $stack = new HistorialStack();
+        foreach (array_reverse($historialRaw) as $mov) {
+            $stack->push((array)$mov);
+        }
+        $historial = $stack->toArray();
+
+        // Usar ClasificacionTree para mostrar categoría del paquete
+        $tree      = new ClasificacionTree();
+        $categoria = $tree->clasificar($encomienda->peso, $encomienda->dimensiones ?? '');
+        $estante   = $tree->asignarEstante($encomienda->peso, $encomienda->dimensiones ?? '');
+
+        return view('encomiendas.ver', compact('encomienda', 'historial', 'categoria', 'estante'));
     }
 
     // Cambiar estado — llama al procedimiento PL/pgSQL
