@@ -5,7 +5,10 @@
 @section('contenido')
 <div class="card">
     <h2 style="margin-bottom:20px">🔔 Alertas Activas</h2>
-
+    <p style="color:#666; margin-bottom:15px">
+    📋 Alertas en cola (FIFO): <strong>{{ $total_en_cola }}</strong> — 
+    se procesan en orden de llegada
+    </p>
     <table>
         <thead>
             <tr>
