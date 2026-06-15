@@ -15,6 +15,10 @@
             <p><strong>Destinatario:</strong> {{ $encomienda->destinatario }}</p>
             <p><strong>Ciudad Destino:</strong> {{ $encomienda->ciudad_destino }}</p>
             <p><strong>Peso:</strong> {{ $encomienda->peso }} kg</p>
+            <p><strong>Categoría:</strong> {{ ucfirst($categoria) }}</p>
+            <p><strong>Estante:</strong> Estante {{ $estante }}
+                ({{ $estante == 1 ? 'Arriba - Pequeños' : ($estante == 2 ? 'Medio - Medianos' : 'Abajo - Grandes') }})
+            </p>
         </div>
         <div>
             <p><strong>Dimensiones:</strong> {{ $encomienda->dimensiones ?? 'No especificado' }}</p>
@@ -109,18 +113,18 @@
             @foreach($historial as $mov)
             <tr>
                 <td>
-                    <span class="badge badge-{{ $mov->estado_anterior }}">
-                        {{ strtoupper(str_replace('_', ' ', $mov->estado_anterior)) }}
+                    <span class="badge badge-{{ $mov['estado_anterior'] }}">
+                        {{ strtoupper(str_replace('_', ' ', $mov['estado_anterior'])) }}
                     </span>
                 </td>
                 <td>
-                    <span class="badge badge-{{ $mov->estado_nuevo }}">
-                        {{ strtoupper(str_replace('_', ' ', $mov->estado_nuevo)) }}
+                    <span class="badge badge-{{ $mov['estado_nuevo'] }}">
+                        {{ strtoupper(str_replace('_', ' ', $mov['estado_nuevo'])) }}
                     </span>
                 </td>
-                <td>{{ $mov->observacion ?? '—' }}</td>
-                <td>{{ $mov->usuario }}</td>
-                <td>{{ \Carbon\Carbon::parse($mov->fecha)->format('d/m/Y H:i') }}</td>
+                <td>{{ $mov['observacion'] ?? '—' }}</td>
+                <td>{{ $mov['usuario'] }}</td>
+                <td>{{ \Carbon\Carbon::parse($mov['fecha'])->format('d/m/Y H:i') }}</td>
             </tr>
             @endforeach
         </tbody>
