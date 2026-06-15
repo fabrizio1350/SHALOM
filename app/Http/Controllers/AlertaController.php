@@ -7,21 +7,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Alerta;
 use App\Models\Encomienda;
+use App\DataStructures\AlertQueue;
 
 class AlertaController extends Controller
 {
     // Listar alertas activas
     public function index()
     {
-        // Primero generar alertas de tiempo excedido via procedimiento
+        // Generar alertas de tiempo excedido via procedimiento
         DB::statement('CALL generar_alertas_tiempo()');
 
-        $alertas = Alerta::with('encomienda')
+        $alertasRaw = Alerta::with('encomienda')
                     ->where('estado', '!=', 'resuelta')
-                    ->orderBy('fecha_generada', 'desc')
+                    ->orderBy('fecha_generada', 'asc')
                     ->get();
 
-        return view('alertas.index', compact('alertas'));
+        // Usar AlertQueue FIFO para procesar en orden de llegada
+        $queue = new AlertQueue();
+        foreach ($alertasRaw as $alerta) {
+            $queue->enqueue($alerta->toArray());
+        }
+
+        $alertas        = $alertasRaw;
+        $total_en_cola  = $queue->size();
+
+        return view('alertas.index', compact('alertas', 'total_en_cola'));
     }
 
     // Atender alerta
@@ -36,7 +46,7 @@ class AlertaController extends Controller
         $alerta->estado = $request->accion;
         $alerta->save();
 
-        // Si se resuelve, cambiar estado de encomienda via procedimiento
+        // Si se resuelve cambiar estado de encomienda
         if ($request->accion === 'resuelta') {
             DB::statement('CALL cambiar_estado_encomienda(?, ?, ?, ?)', [
                 $alerta->id_encomienda,
