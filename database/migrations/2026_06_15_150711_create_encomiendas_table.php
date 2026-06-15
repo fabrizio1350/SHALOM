@@ -6,22 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('encomiendas', function (Blueprint $table) {
-            $table->id();
+        Schema::create('zonas', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('nombre', 50)->unique();
+            $table->integer('capacidad')->default(10);
+            $table->string('estado', 25)->default('disponible');
+            // valores: disponible | parcialmente_ocupada | llena | eliminada
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('encomiendas');
+        Schema::dropIfExists('zonas');
     }
 };

@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('alertas', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
+            $table->string('id_encomienda', 20);
+            $table->foreign('id_encomienda')->references('id_encomienda')->on('encomiendas');
+            $table->string('tipo', 50);
+            // valores: tiempo_excedido | dano_fisico
+            $table->string('estado', 20)->default('generada');
+            // valores: generada | notificada | atendida | resuelta
+            $table->timestamp('fecha_generada')->useCurrent();
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('alertas');

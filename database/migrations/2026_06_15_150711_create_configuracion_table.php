@@ -6,20 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('configuracion', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
+            $table->integer('tiempo_maximo_dias')->default(7);
+            $table->unsignedInteger('id_zona_reubicacion')->nullable();
+            $table->foreign('id_zona_reubicacion')->references('id')->on('zonas');
+            $table->timestamp('fecha_actualizacion')->useCurrent();
+            $table->unsignedBigInteger('id_admin')->nullable();
+            $table->foreign('id_admin')->references('id')->on('users');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('configuracion');
