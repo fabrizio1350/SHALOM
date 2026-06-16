@@ -10,40 +10,49 @@ use App\Models\Zona;
 class ReporteController extends Controller
 {
     // Ver reporte de inventario
-    public function index(Request $request)
-    {
-        $zonas  = Zona::where('estado', '!=', 'eliminada')->get();
-        $filtro_zona   = $request->get('zona');
-        $filtro_estado = $request->get('estado');
+public function index(Request $request)
+{
+    $zonas         = Zona::where('estado', '!=', 'eliminada')->get();
+    $filtro_zona   = $request->get('zona');
+    $filtro_estado = $request->get('estado');
 
-        $query = Encomienda::with('zona');
+    $query = Encomienda::with('zona');
 
-        if ($filtro_zona) {
-            $query->where('id_zona', $filtro_zona);
-        }
-
-        if ($filtro_estado) {
-            $query->where('estado', $filtro_estado);
-        }
-
-        $encomiendas = $query->orderBy('fecha_ingreso', 'desc')->get();
-
-        // Estadisticas generales
-        $estadisticas = DB::select('
-            SELECT
-                COUNT(*) as total,
-                COUNT(CASE WHEN estado = \'recibido\' THEN 1 END) as recibidas,
-                COUNT(CASE WHEN estado = \'clasificado\' THEN 1 END) as clasificadas,
-                COUNT(CASE WHEN estado = \'en_espera\' THEN 1 END) as en_espera,
-                COUNT(CASE WHEN estado = \'despachado\' THEN 1 END) as despachadas,
-                COUNT(CASE WHEN estado = \'daniado\' THEN 1 END) as daniadas,
-                COUNT(CASE WHEN estado = \'tiempo_excedido\' THEN 1 END) as tiempo_excedido
-            FROM encomiendas
-        ');
-
-        return view('reportes.index', compact('encomiendas', 'zonas', 'estadisticas', 'filtro_zona', 'filtro_estado'));
+    if ($filtro_zona) {
+        $query->where('id_zona', $filtro_zona);
     }
 
+    if ($filtro_estado) {
+        $query->where('estado', $filtro_estado);
+    } else {
+        // Por defecto no mostrar despachadas antiguas
+        // Las despachadas solo se muestran si tienen menos de 7 dias
+        $query->where(function($q) {
+            $q->where('estado', '!=', 'despachado')
+              ->orWhere(function($q2) {
+                  $q2->where('estado', 'despachado')
+                     ->where('updated_at', '>=', now()->subDays(7));
+              });
+        });
+    }
+
+    $encomiendas = $query->orderBy('fecha_ingreso', 'desc')->get();
+
+    // Estadisticas generales
+    $estadisticas = DB::select('
+        SELECT
+            COUNT(*) as total,
+            COUNT(CASE WHEN estado = \'recibido\' THEN 1 END) as recibidas,
+            COUNT(CASE WHEN estado = \'clasificado\' THEN 1 END) as clasificadas,
+            COUNT(CASE WHEN estado = \'en_espera\' THEN 1 END) as en_espera,
+            COUNT(CASE WHEN estado = \'despachado\' AND updated_at >= NOW() - INTERVAL \'7 days\' THEN 1 END) as despachadas,
+            COUNT(CASE WHEN estado = \'daniado\' THEN 1 END) as daniadas,
+            COUNT(CASE WHEN estado = \'tiempo_excedido\' THEN 1 END) as tiempo_excedido
+        FROM encomiendas
+    ');
+
+    return view('reportes.index', compact('encomiendas', 'zonas', 'estadisticas', 'filtro_zona', 'filtro_estado'));
+}
     // Exportar reporte
     public function exportar(Request $request)
     {
