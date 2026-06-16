@@ -109,6 +109,8 @@ class UsuarioController extends Controller
     {
         $request->validate([
             'tiempo_maximo_dias'   => 'required|integer|min:1',
+            'peso_maximo_pequeno'  => 'required|numeric|min:0.1',
+            'peso_maximo_mediano'  => 'required|numeric|min:0.1',
             'id_zona_reubicacion'  => 'nullable|exists:zonas,id'
         ]);
 
@@ -117,6 +119,8 @@ class UsuarioController extends Controller
         if ($config) {
             $config->update([
                 'tiempo_maximo_dias'  => $request->tiempo_maximo_dias,
+                'peso_maximo_pequeno' => $request->peso_maximo_pequeno,
+                'peso_maximo_mediano' => $request->peso_maximo_mediano,
                 'id_zona_reubicacion' => $request->id_zona_reubicacion,
                 'fecha_actualizacion' => now(),
                 'id_admin'            => Auth::id()
@@ -124,6 +128,8 @@ class UsuarioController extends Controller
         } else {
             Configuracion::create([
                 'tiempo_maximo_dias'  => $request->tiempo_maximo_dias,
+                'peso_maximo_pequeno' => $request->peso_maximo_pequeno,
+                'peso_maximo_mediano' => $request->peso_maximo_mediano,
                 'id_zona_reubicacion' => $request->id_zona_reubicacion,
                 'fecha_actualizacion' => now(),
                 'id_admin'            => Auth::id()

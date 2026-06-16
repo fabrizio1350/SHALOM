@@ -10,6 +10,8 @@ class Configuracion extends Model
 
     protected $fillable = [
         'tiempo_maximo_dias',
+        'peso_maximo_pequeno',
+        'peso_maximo_mediano',
         'id_zona_reubicacion',
         'fecha_actualizacion',
         'id_admin'
