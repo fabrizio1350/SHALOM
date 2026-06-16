@@ -56,7 +56,7 @@
         <div>
             <strong>🚚 Shalom</strong>
             <a href="{{ route('encomiendas.index') }}" style="margin-left:20px">Encomiendas</a>
-            @if(auth()->user()->rol === 'supervisor' || auth()->user()->rol === 'administrador')
+            @if(auth()->user()->rol === 'supervisor')
                 <a href="{{ route('alertas.index') }}">Alertas</a>
                 <a href="{{ route('reportes.index') }}">Reportes</a>
             @endif
