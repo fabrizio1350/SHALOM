@@ -28,11 +28,12 @@ Route::middleware(['rol:operario,supervisor,administrador'])->group(function () 
     Route::get('/encomiendas/{id}', [EncomiendaController::class, 'ver'])->name('encomiendas.ver');
     Route::post('/encomiendas/{id}/estado', [EncomiendaController::class, 'cambiarEstado'])->name('encomiendas.estado');
     Route::post('/encomiendas/{id}/despachar', [EncomiendaController::class, 'despachar'])->name('encomiendas.despachar');
+    Route::post('/encomiendas/{id}/reubicar', [EncomiendaController::class, 'reubicar'])->name('encomiendas.reubicar');
     Route::post('/encomiendas/{id}/danio', [EncomiendaController::class, 'notificarDanio'])->name('encomiendas.danio');
 });
 
 // Rutas del SUPERVISOR
-Route::middleware(['rol:supervisor,administrador'])->group(function () {
+Route::middleware(['rol:supervisor'])->group(function () {
     Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
     Route::post('/alertas/{id}/atender', [AlertaController::class, 'atender'])->name('alertas.atender');
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');

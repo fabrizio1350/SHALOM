@@ -104,6 +104,22 @@ class EncomiendaController extends Controller
         return redirect()->route('encomiendas.ver', $id)->with('success', 'Estado actualizado.');
     }
 
+    // Reubicar encomienda por tiempo excedido
+    public function reubicar(Request $request, $id)
+    {
+        $request->validate([
+            'observacion' => 'required|string'
+        ]);
+
+        DB::statement('CALL reubicar_encomienda(?, ?, ?)', [
+            $id,
+            $request->observacion,
+            Auth::id()
+        ]);
+
+        return redirect()->route('encomiendas.ver', $id)->with('success', 'Encomienda reubicada correctamente.');
+    }
+
     // Despachar encomienda
     public function despachar(Request $request, $id)
     {

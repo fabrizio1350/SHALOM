@@ -68,7 +68,7 @@
 <div class="card" style="border-left: 4px solid #6f42c1">
     <h3 style="margin-bottom:15px; color:#6f42c1">⚠️ Reubicar Encomienda</h3>
     <p style="margin-bottom:15px">Esta encomienda ha excedido el tiempo máximo de almacenamiento. Debe ser reubicada.</p>
-    <form action="{{ route('encomiendas.estado', $encomienda->id_encomienda) }}" method="POST">
+    <form action="{{ route('encomiendas.reubicar', $encomienda->id_encomienda) }}" method="POST">
         @csrf
         <input type="hidden" name="estado" value="en_espera">
         <div class="form-group">
