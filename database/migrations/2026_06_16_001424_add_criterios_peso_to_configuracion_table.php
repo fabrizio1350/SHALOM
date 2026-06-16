@@ -6,23 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('configuracion', function (Blueprint $table) {
-            //
+            $table->decimal('peso_maximo_pequeno', 8, 2)->default(5.00)->after('tiempo_maximo_dias');
+            $table->decimal('peso_maximo_mediano', 8, 2)->default(20.00)->after('peso_maximo_pequeno');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('configuracion', function (Blueprint $table) {
-            //
+            $table->dropColumn(['peso_maximo_pequeno', 'peso_maximo_mediano']);
         });
     }
 };
