@@ -2,22 +2,35 @@
 
 namespace App\DataStructures;
 
+use App\Models\Configuracion;
+
 // Árbol de decisión — Labs S09-S12 de Algoritmos
 // Clasifica paquetes por peso y tamaño para asignar zona y estante
+// Los criterios de peso se leen de la BD (configurados por el admin)
 class ClasificacionTree
 {
+    private float $pesoMaximoPequeno;
+    private float $pesoMaximoMediano;
+
+    public function __construct()
+    {
+        // Leer criterios de la BD
+        $config = Configuracion::first();
+        $this->pesoMaximoPequeno = $config ? (float)$config->peso_maximo_pequeno : 5.0;
+        $this->pesoMaximoMediano = $config ? (float)$config->peso_maximo_mediano : 20.0;
+    }
+
     // Retorna la categoría: 'pequeño', 'mediano', 'grande'
     public function clasificar(float $peso, string $dimensiones = ''): string
     {
-        // Árbol de decisión por peso primero
-        if ($peso <= 5) {
+        if ($peso <= $this->pesoMaximoPequeno) {
             if ($dimensiones) {
                 $volumen = $this->calcularVolumen($dimensiones);
                 if ($volumen <= 5000) return 'pequeño';
                 return 'mediano';
             }
             return 'pequeño';
-        } elseif ($peso <= 20) {
+        } elseif ($peso <= $this->pesoMaximoMediano) {
             if ($dimensiones) {
                 $volumen = $this->calcularVolumen($dimensiones);
                 if ($volumen <= 15000) return 'mediano';
@@ -30,11 +43,9 @@ class ClasificacionTree
     }
 
     // Retorna el estante según la categoría
-    // Estante 1 = arriba (pequeños), Estante 2 = medio, Estante 3 = abajo (grandes)
     public function asignarEstante(float $peso, string $dimensiones = ''): int
     {
         $categoria = $this->clasificar($peso, $dimensiones);
-
         switch ($categoria) {
             case 'pequeño': return 1;
             case 'mediano': return 2;
