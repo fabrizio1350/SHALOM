@@ -25,7 +25,7 @@ class Configuracion extends Model
 
     // Admin que hizo el ultimo cambio
     public function admin()
-    {
+    { 
         return $this->belongsTo(User::class, 'id_admin');
     }
 }
