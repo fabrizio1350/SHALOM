@@ -11,21 +11,25 @@ use App\DataStructures\AlertQueue;
 
 class AlertaController extends Controller
 {
-        // Listar alertas activas
+    // Listar alertas activas usando función PL/pgSQL con cursor
     public function index()
     {
-        $alertasRaw = Alerta::with('encomienda')
+        // Llamar función PL/pgSQL que usa cursor internamente
+        $alertasRaw = DB::select('SELECT * FROM obtener_alertas_activas()');
+
+        // Usar AlertQueue FIFO para procesar en orden de llegada
+        $queue = new AlertQueue();
+        foreach ($alertasRaw as $alerta) {
+            $queue->enqueue((array)$alerta);
+        }
+
+        $total_en_cola = $queue->size();
+
+        // Obtener alertas con relación encomienda para la vista
+        $alertas = Alerta::with('encomienda')
                     ->where('estado', '!=', 'resuelta')
                     ->orderBy('fecha_generada', 'asc')
                     ->get();
-
-        $queue = new AlertQueue();
-        foreach ($alertasRaw as $alerta) {
-            $queue->enqueue($alerta->toArray());
-        }
-
-        $alertas       = $alertasRaw;
-        $total_en_cola = $queue->size();
 
         return view('alertas.index', compact('alertas', 'total_en_cola'));
     }
@@ -42,7 +46,7 @@ class AlertaController extends Controller
         $alerta->estado = $request->accion;
         $alerta->save();
 
-        // Si se resuelve cambiar estado de encomienda
+        // Si se resuelve cambiar estado de encomienda via procedimiento
         if ($request->accion === 'resuelta') {
             DB::statement('CALL cambiar_estado_encomienda(?, ?, ?, ?)', [
                 $alerta->id_encomienda,
