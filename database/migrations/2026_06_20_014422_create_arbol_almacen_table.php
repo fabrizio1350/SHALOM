@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('arbol_almacen', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
+            $table->integer('nivel');
+            $table->string('tipo', 20); // almacen, zona, encomienda
+            $table->string('id_nodo', 20);
+            $table->string('nombre', 200);
+            $table->string('estado', 25);
+            $table->unsignedInteger('id_padre')->nullable();
+            $table->foreign('id_padre')->references('id')->on('arbol_almacen');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('arbol_almacen');
