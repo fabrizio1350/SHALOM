@@ -97,24 +97,21 @@
 
 {{-- Historial de movimientos --}}
 <div class="card">
-    <h3 style="margin-bottom:15px">📋 Historial de Movimientos (Árbol)</h3>
+    <h3 style="margin-bottom:15px">📋 Historial de Movimientos</h3>
     @if(count($historial) > 0)
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Estado Anterior</th>
                 <th>Estado Nuevo</th>
                 <th>Observación</th>
                 <th>Usuario</th>
                 <th>Fecha</th>
-                <th>Nodo Padre</th>
             </tr>
         </thead>
         <tbody>
             @foreach($historial as $mov)
             <tr>
-                <td>#{{ $mov['id'] }}</td>
                 <td>
                     <span class="badge badge-{{ $mov['estado_anterior'] }}">
                         {{ strtoupper(str_replace('_', ' ', $mov['estado_anterior'])) }}
@@ -128,13 +125,6 @@
                 <td>{{ $mov['observacion'] ?? '—' }}</td>
                 <td>{{ $mov['usuario'] }}</td>
                 <td>{{ \Carbon\Carbon::parse($mov['fecha'])->format('d/m/Y H:i') }}</td>
-                <td>
-                    @if($mov['id_padre'])
-                        <span style="color:#007bff">← Nodo #{{ $mov['id_padre'] }}</span>
-                    @else
-                        <span style="color:#28a745">🌱 Raíz</span>
-                    @endif
-                </td>
             </tr>
             @endforeach
         </tbody>
