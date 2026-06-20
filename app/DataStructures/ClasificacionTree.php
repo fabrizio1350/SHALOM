@@ -5,8 +5,7 @@ namespace App\DataStructures;
 use App\Models\Configuracion;
 
 // Árbol de decisión — Labs S09-S12 de Algoritmos
-// Clasifica paquetes por peso y tamaño para asignar zona y estante
-// Los criterios de peso se leen de la BD (configurados por el admin)
+// Clasifica paquetes por peso para asignar ESTANTE dentro de cualquier zona
 class ClasificacionTree
 {
     private float $pesoMaximoPequeno;
@@ -14,9 +13,8 @@ class ClasificacionTree
 
     public function __construct()
     {
-        // Leer criterios de la BD
         $config = Configuracion::first();
-        $this->pesoMaximoPequeno = $config ? (float)$config->peso_maximo_pequeno : 5.0;
+        $this->pesoMaximoPequeno = $config ? (float)$config->peso_maximo_pequeno : 4.0;
         $this->pesoMaximoMediano = $config ? (float)$config->peso_maximo_mediano : 20.0;
     }
 
@@ -24,25 +22,16 @@ class ClasificacionTree
     public function clasificar(float $peso, string $dimensiones = ''): string
     {
         if ($peso <= $this->pesoMaximoPequeno) {
-            if ($dimensiones) {
-                $volumen = $this->calcularVolumen($dimensiones);
-                if ($volumen <= 5000) return 'pequeño';
-                return 'mediano';
-            }
             return 'pequeño';
         } elseif ($peso <= $this->pesoMaximoMediano) {
-            if ($dimensiones) {
-                $volumen = $this->calcularVolumen($dimensiones);
-                if ($volumen <= 15000) return 'mediano';
-                return 'grande';
-            }
             return 'mediano';
         } else {
             return 'grande';
         }
     }
 
-    // Retorna el estante según la categoría
+    // Retorna el estante dentro de la zona
+    // Estante 1 = arriba (pequeños), Estante 2 = medio, Estante 3 = abajo (grandes)
     public function asignarEstante(float $peso, string $dimensiones = ''): int
     {
         $categoria = $this->clasificar($peso, $dimensiones);
@@ -52,15 +41,5 @@ class ClasificacionTree
             case 'grande':  return 3;
             default:        return 1;
         }
-    }
-
-    // Calcular volumen desde dimensiones "LxAxH"
-    private function calcularVolumen(string $dimensiones): float
-    {
-        $dims = explode('x', strtolower(str_replace(' ', '', $dimensiones)));
-        if (count($dims) === 3) {
-            return (float)$dims[0] * (float)$dims[1] * (float)$dims[2];
-        }
-        return 0;
     }
 }
