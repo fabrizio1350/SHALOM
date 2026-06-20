@@ -65,6 +65,7 @@
                 <a href="{{ route('usuarios.index') }}">Usuarios</a>
                 <a href="{{ route('configuracion') }}">Configuración</a>
             @endif
+            <a href="{{ route('almacen') }}">🏭 Almacén</a>
         </div>
         <div>
             <span>{{ auth()->user()->name }} ({{ auth()->user()->rol }})</span>
