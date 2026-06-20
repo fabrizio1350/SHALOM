@@ -11,25 +11,21 @@ use App\DataStructures\AlertQueue;
 
 class AlertaController extends Controller
 {
-    // Listar alertas activas
+        // Listar alertas activas
     public function index()
     {
-        // Generar alertas de tiempo excedido via procedimiento
-        DB::statement('CALL generar_alertas_tiempo()');
-
         $alertasRaw = Alerta::with('encomienda')
                     ->where('estado', '!=', 'resuelta')
                     ->orderBy('fecha_generada', 'asc')
                     ->get();
 
-        // Usar AlertQueue FIFO para procesar en orden de llegada
         $queue = new AlertQueue();
         foreach ($alertasRaw as $alerta) {
             $queue->enqueue($alerta->toArray());
         }
 
-        $alertas        = $alertasRaw;
-        $total_en_cola  = $queue->size();
+        $alertas       = $alertasRaw;
+        $total_en_cola = $queue->size();
 
         return view('alertas.index', compact('alertas', 'total_en_cola'));
     }
