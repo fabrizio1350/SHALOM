@@ -9,20 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('historial_movimientos', function (Blueprint $table) {
-            //
-        });
-    }
+public function up(): void
+{
+    Schema::table('historial_movimientos', function (Blueprint $table) {
+        $table->dropForeign(['id_padre']);
+        $table->dropColumn('id_padre');
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('historial_movimientos', function (Blueprint $table) {
-            //
-        });
-    }
+public function down(): void
+{
+    Schema::table('historial_movimientos', function (Blueprint $table) {
+        $table->unsignedInteger('id_padre')->nullable()->after('id');
+        $table->foreign('id_padre')->references('id')->on('historial_movimientos');
+    });
+}
 };
