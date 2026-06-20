@@ -15,6 +15,7 @@ class HistorialMovimiento extends Model
         'estado_nuevo',
         'observacion',
         'id_usuario',
+        'id_padre',
         'created_at'
     ];
 
@@ -28,5 +29,17 @@ class HistorialMovimiento extends Model
     public function usuario()
     {
         return $this->belongsTo(User::class, 'id_usuario');
+    }
+
+    // Relación padre
+    public function padre()
+    {
+        return $this->belongsTo(HistorialMovimiento::class, 'id_padre');
+    }
+
+    // Relación hijos
+    public function hijos()
+    {
+        return $this->hasMany(HistorialMovimiento::class, 'id_padre');
     }
 }
