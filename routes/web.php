@@ -20,6 +20,7 @@ Route::post('/logout', [UsuarioController::class, 'logout'])->name('logout');
 // Rutas del OPERARIO
 Route::middleware(['rol:operario,supervisor,administrador'])->group(function () {
     Route::get('/dashboard', [EncomiendaController::class, 'index'])->name('dashboard');
+    Route::get('/almacen', [ZonaController::class, 'almacen'])->name('almacen'); // ← AGREGAR
 
     // Encomiendas
     Route::get('/encomiendas', [EncomiendaController::class, 'index'])->name('encomiendas.index');
