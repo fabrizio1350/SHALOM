@@ -31,7 +31,11 @@
                     </span>
                 </td>
                 <td>
-                    <span class="badge" style="background:{{ $alerta->estado === 'generada' ? '#ffc107' : '#17a2b8' }}; color:{{ $alerta->estado === 'generada' ? 'black' : 'white' }}">
+                    <span class="badge" style="background:
+                        {{ $alerta->estado === 'generada' ? '#ffc107' : 
+                        ($alerta->estado === 'notificada' ? '#17a2b8' : 
+                        ($alerta->estado === 'atendida' ? '#28a745' : '#6c757d')) }};
+                        color:{{ $alerta->estado === 'generada' ? 'black' : 'white' }}">
                         {{ strtoupper($alerta->estado) }}
                     </span>
                 </td>
