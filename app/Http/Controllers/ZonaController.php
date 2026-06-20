@@ -58,4 +58,28 @@ class ZonaController extends Controller
 
         return redirect()->route('zonas.index')->with('success', 'Zona eliminada correctamente.');
     }
+        // Vista 2D del almacen
+    public function almacen()
+    {
+        $zonas = Zona::where('estado', '!=', 'eliminada')
+                    ->with(['encomiendas' => function($q) {
+                        $q->where('estado', '!=', 'despachado');
+                    }])
+                    ->get();
+
+        $tree = new \App\DataStructures\ClasificacionTree();
+        $almacenTree = new \App\DataStructures\AlmacenTree();
+
+        foreach ($zonas as $zona) {
+            $almacenTree->agregarZona($zona->toArray());
+            foreach ($zona->encomiendas as $enc) {
+                $estante = $tree->asignarEstante($enc->peso, $enc->dimensiones ?? '');
+                $almacenTree->agregarPaquete($enc->toArray(), $estante);
+            }
+        }
+
+        $arbol = $almacenTree->getTree();
+
+        return view('zonas.almacen', compact('arbol'));
+    }
 }
