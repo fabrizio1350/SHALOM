@@ -25,7 +25,9 @@ Route::middleware(['rol:operario,supervisor,administrador'])->group(function () 
     // Encomiendas
     Route::get('/encomiendas', [EncomiendaController::class, 'index'])->name('encomiendas.index');
     Route::get('/encomiendas/crear', [EncomiendaController::class, 'crear'])->name('encomiendas.crear');
-    Route::post('/encomiendas', [EncomiendaController::class, 'registrar'])->name('encomiendas.registrar');
+    Route::post('/encomiendas', [EncomiendaController::class, 'registrar'])
+        ->middleware('validar.encomienda')
+        ->name('encomiendas.registrar');
     Route::get('/encomiendas/{id}', [EncomiendaController::class, 'ver'])->name('encomiendas.ver');
     Route::post('/encomiendas/{id}/estado', [EncomiendaController::class, 'cambiarEstado'])->name('encomiendas.estado');
     Route::post('/encomiendas/{id}/despachar', [EncomiendaController::class, 'despachar'])->name('encomiendas.despachar');

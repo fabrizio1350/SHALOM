@@ -49,7 +49,30 @@ class EncomiendaController extends Controller
             'peso.max'               => 'El peso máximo es 500 kg.',
             'dimensiones.regex'      => 'Las dimensiones deben tener formato LxAxH (ej: 30x20x15).',
         ]);
+        // Validar dimensiones máximas y volumen
+        if ($request->dimensiones) {
+            $dims = explode('x', strtolower(str_replace(' ', '', $request->dimensiones)));
+            if (count($dims) === 3) {
+                $largo = (int)$dims[0];
+                $ancho = (int)$dims[1];
+                $alto  = (int)$dims[2];
 
+                if ($largo > 600) {
+                    return back()->withErrors(['dimensiones' => 'El largo máximo es 600 cm.'])->withInput();
+                }
+                if ($ancho > 230) {
+                    return back()->withErrors(['dimensiones' => 'El ancho máximo es 230 cm.'])->withInput();
+                }
+                if ($alto > 240) {
+                    return back()->withErrors(['dimensiones' => 'El alto máximo es 240 cm.'])->withInput();
+                }
+
+                $volumen = ($largo * $ancho * $alto) / 1000000; // en m3
+                if ($volumen > 12.7) {
+                    return back()->withErrors(['dimensiones' => 'El volumen máximo es 12.7 m³. Esta encomienda requiere cotización especial.'])->withInput();
+                }
+            }
+        }
         // Usar ClasificacionTree para clasificar el paquete
         $tree     = new ClasificacionTree();
         $categoria = $tree->clasificar($request->peso, $request->dimensiones ?? '');
