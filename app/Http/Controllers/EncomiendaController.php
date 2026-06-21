@@ -35,12 +35,19 @@ class EncomiendaController extends Controller
     public function registrar(Request $request)
     {
         $request->validate([
-            'remitente'      => 'required|string|max:100',
-            'destinatario'   => 'required|string|max:100',
-            'ciudad_destino' => 'required|string|max:100',
-            'peso'           => 'required|numeric|min:0.1',
-            'dimensiones'    => 'nullable|string|max:50',
-            'descripcion'    => 'nullable|string'
+            'remitente'      => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'destinatario'   => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'ciudad_destino' => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'peso'           => 'required|numeric|min:0.1|max:500',
+            'dimensiones'    => ['nullable', 'string', 'max:50', 'regex:/^\d+x\d+x\d+$/'],
+            'descripcion'    => 'nullable|string|max:500'
+        ], [
+            'remitente.regex'        => 'El remitente solo puede contener letras.',
+            'destinatario.regex'     => 'El destinatario solo puede contener letras.',
+            'ciudad_destino.regex'   => 'La ciudad solo puede contener letras.',
+            'peso.min'               => 'El peso mínimo es 0.1 kg.',
+            'peso.max'               => 'El peso máximo es 500 kg.',
+            'dimensiones.regex'      => 'Las dimensiones deben tener formato LxAxH (ej: 30x20x15).',
         ]);
 
         // Usar ClasificacionTree para clasificar el paquete
