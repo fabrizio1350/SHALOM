@@ -30,7 +30,6 @@ class EncomiendaController extends Controller
                      ->get();
         return view('encomiendas.crear', compact('zonas'));
     }
-
     // Registrar encomienda — llama al procedimiento PL/pgSQL
     public function registrar(Request $request)
     {
@@ -38,43 +37,20 @@ class EncomiendaController extends Controller
             'remitente'      => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'destinatario'   => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'ciudad_destino' => 'required|in:Abancay,Arequipa,Ayacucho,Bagua,Cajamarca,Callao,Chiclayo,Chimbote,Cusco,Huancayo,Huanuco,Huaraz,Ica,Ilo,Iquitos,Juliaca,Lima,Moquegua,Moyobamba,Nazca,Piura,Pucallpa,Puerto Maldonado,Puno,Sullana,Tacna,Tarapoto,Tarma,Trujillo,Tumbes,Yurimaguas',
-            'peso'           => 'required|numeric|min:0.1|max:500',
+            'peso'           => 'required|numeric|min:0.1|max:70',
             'dimensiones'    => ['nullable', 'string', 'max:50', 'regex:/^\d+x\d+x\d+$/'],
             'descripcion'    => 'nullable|string|max:500'
         ], [
             'remitente.regex'        => 'El remitente solo puede contener letras.',
             'destinatario.regex'     => 'El destinatario solo puede contener letras.',
-            'ciudad_destino.in'      => 'La ciudad destino no es válida.',
+            'ciudad_destino.in'      => 'Selecciona una ciudad válida.',
             'peso.min'               => 'El peso mínimo es 0.1 kg.',
-            'peso.max'               => 'El peso máximo es 500 kg.',
+            'peso.max'               => 'El peso máximo es 70 kg.',
             'dimensiones.regex'      => 'Las dimensiones deben tener formato LxAxH (ej: 30x20x15).',
         ]);
-        // Validar dimensiones máximas y volumen
-        if ($request->dimensiones) {
-            $dims = explode('x', strtolower(str_replace(' ', '', $request->dimensiones)));
-            if (count($dims) === 3) {
-                $largo = (int)$dims[0];
-                $ancho = (int)$dims[1];
-                $alto  = (int)$dims[2];
 
-                if ($largo > 600) {
-                    return back()->withErrors(['dimensiones' => 'El largo máximo es 600 cm.'])->withInput();
-                }
-                if ($ancho > 230) {
-                    return back()->withErrors(['dimensiones' => 'El ancho máximo es 230 cm.'])->withInput();
-                }
-                if ($alto > 240) {
-                    return back()->withErrors(['dimensiones' => 'El alto máximo es 240 cm.'])->withInput();
-                }
-
-                $volumen = ($largo * $ancho * $alto) / 1000000; // en m3
-                if ($volumen > 12.7) {
-                    return back()->withErrors(['dimensiones' => 'El volumen máximo es 12.7 m³. Esta encomienda requiere cotización especial.'])->withInput();
-                }
-            }
-        }
         // Usar ClasificacionTree para clasificar el paquete
-        $tree     = new ClasificacionTree();
+        $tree      = new ClasificacionTree();
         $categoria = $tree->clasificar($request->peso, $request->dimensiones ?? '');
         $estante   = $tree->asignarEstante($request->peso, $request->dimensiones ?? '');
 
@@ -90,9 +66,8 @@ class EncomiendaController extends Controller
         ]);
 
         return redirect()->route('encomiendas.index')
-               ->with('success', "Encomienda registrada — Categoría: $categoria, Estante: $estante");
+            ->with('success', "Encomienda registrada — Categoría: $categoria, Estante: $estante");
     }
-
     // Ver detalle de encomienda
     public function ver($id)
     {
