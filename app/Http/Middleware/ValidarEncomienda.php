@@ -20,19 +20,19 @@ class ValidarEncomienda
                     $ancho = (int)$dims[1];
                     $alto  = (int)$dims[2];
 
-                    if ($largo > 600) {
-                        return back()->withErrors(['dimensiones' => 'El largo máximo es 600 cm.'])->withInput();
+                    if ($largo > 120) {
+                        return back()->withErrors(['dimensiones' => 'El largo máximo es 120 cm.'])->withInput();
                     }
-                    if ($ancho > 230) {
-                        return back()->withErrors(['dimensiones' => 'El ancho máximo es 230 cm.'])->withInput();
+                    if ($ancho > 80) {
+                        return back()->withErrors(['dimensiones' => 'El ancho máximo es 80 cm.'])->withInput();
                     }
-                    if ($alto > 240) {
-                        return back()->withErrors(['dimensiones' => 'El alto máximo es 240 cm.'])->withInput();
+                    if ($alto > 80) {
+                        return back()->withErrors(['dimensiones' => 'El alto máximo es 80 cm.'])->withInput();
                     }
 
-                    $volumen = ($largo * $ancho * $alto) / 1000000;
-                    if ($volumen > 12.7) {
-                        return back()->withErrors(['dimensiones' => 'El volumen máximo es 12.7 m³. Requiere cotización especial.'])->withInput();
+                    $volumen = $largo * $ancho * $alto;
+                    if ($volumen > 500000) {
+                        return back()->withErrors(['dimensiones' => 'Las dimensiones superan el volumen máximo permitido (120x80x80 cm).'])->withInput();
                     }
                 }
             }
