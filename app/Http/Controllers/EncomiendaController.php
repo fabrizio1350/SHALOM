@@ -37,14 +37,14 @@ class EncomiendaController extends Controller
         $request->validate([
             'remitente'      => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'destinatario'   => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
-            'ciudad_destino' => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'ciudad_destino' => 'required|in:Abancay,Arequipa,Ayacucho,Bagua,Cajamarca,Callao,Chiclayo,Chimbote,Cusco,Huancayo,Huanuco,Huaraz,Ica,Ilo,Iquitos,Juliaca,Lima,Moquegua,Moyobamba,Nazca,Piura,Pucallpa,Puerto Maldonado,Puno,Sullana,Tacna,Tarapoto,Tarma,Trujillo,Tumbes,Yurimaguas',
             'peso'           => 'required|numeric|min:0.1|max:500',
             'dimensiones'    => ['nullable', 'string', 'max:50', 'regex:/^\d+x\d+x\d+$/'],
             'descripcion'    => 'nullable|string|max:500'
         ], [
             'remitente.regex'        => 'El remitente solo puede contener letras.',
             'destinatario.regex'     => 'El destinatario solo puede contener letras.',
-            'ciudad_destino.regex'   => 'La ciudad solo puede contener letras.',
+            'ciudad_destino.in'      => 'La ciudad destino no es válida.',
             'peso.min'               => 'El peso mínimo es 0.1 kg.',
             'peso.max'               => 'El peso máximo es 500 kg.',
             'dimensiones.regex'      => 'Las dimensiones deben tener formato LxAxH (ej: 30x20x15).',

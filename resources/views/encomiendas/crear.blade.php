@@ -26,7 +26,40 @@
         </div>
         <div class="form-group">
             <label>Ciudad Destino</label>
-            <input type="text" name="ciudad_destino" value="{{ old('ciudad_destino') }}" required>
+            <select name="ciudad_destino" required>
+                <option value="">Seleccionar ciudad...</option>
+                <option value="Abancay">Abancay</option>
+                <option value="Arequipa">Arequipa</option>
+                <option value="Ayacucho">Ayacucho</option>
+                <option value="Bagua">Bagua</option>
+                <option value="Cajamarca">Cajamarca</option>
+                <option value="Callao">Callao</option>
+                <option value="Chiclayo">Chiclayo</option>
+                <option value="Chimbote">Chimbote</option>
+                <option value="Cusco">Cusco</option>
+                <option value="Huancayo">Huancayo</option>
+                <option value="Huanuco">Huánuco</option>
+                <option value="Huaraz">Huaraz</option>
+                <option value="Ica">Ica</option>
+                <option value="Ilo">Ilo</option>
+                <option value="Iquitos">Iquitos</option>
+                <option value="Juliaca">Juliaca</option>
+                <option value="Lima">Lima</option>
+                <option value="Moquegua">Moquegua</option>
+                <option value="Moyobamba">Moyobamba</option>
+                <option value="Nazca">Nazca</option>
+                <option value="Piura">Piura</option>
+                <option value="Pucallpa">Pucallpa</option>
+                <option value="Puerto Maldonado">Puerto Maldonado</option>
+                <option value="Puno">Puno</option>
+                <option value="Sullana">Sullana</option>
+                <option value="Tacna">Tacna</option>
+                <option value="Tarapoto">Tarapoto</option>
+                <option value="Tarma">Tarma</option>
+                <option value="Trujillo">Trujillo</option>
+                <option value="Tumbes">Tumbes</option>
+                <option value="Yurimaguas">Yurimaguas</option>
+            </select>
         </div>
         <div class="form-group">
             <label>Peso (kg)</label>
