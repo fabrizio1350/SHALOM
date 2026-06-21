@@ -97,7 +97,9 @@
 
 {{-- Historial de movimientos --}}
 <div class="card">
-    <h3 style="margin-bottom:15px">📋 Historial de Movimientos</h3>
+    <h3 style="margin-bottom:15px">📋 Historial de Movimientos 
+    <span style="font-size:14px; color:#666">({{ $totalMovimientos }} movimientos registrados)</span>
+    </h3>
     @if(count($historial) > 0)
     <table>
         <thead>

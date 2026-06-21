@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Encomienda;
 use App\Models\Zona;
-use App\DataStructures\AlertQueue;
 use App\DataStructures\HistorialStack;
 use App\DataStructures\ClasificacionTree;
 
@@ -76,6 +75,9 @@ class EncomiendaController extends Controller
         // Obtener historial via función PL/pgSQL
         $historialRaw = DB::select('SELECT * FROM obtener_historial_encomienda(?)', [$id]);
 
+        // Usar modelo HistorialMovimiento para estadísticas
+        $totalMovimientos = \App\Models\HistorialMovimiento::where('id_encomienda', $id)->count();
+
         // Usar HistorialStack para ordenar más reciente primero
         $stack = new HistorialStack();
         foreach (array_reverse($historialRaw) as $mov) {
@@ -88,7 +90,7 @@ class EncomiendaController extends Controller
         $categoria = $tree->clasificar($encomienda->peso, $encomienda->dimensiones ?? '');
         $estante   = $tree->asignarEstante($encomienda->peso, $encomienda->dimensiones ?? '');
 
-        return view('encomiendas.ver', compact('encomienda', 'historial', 'categoria', 'estante'));
+        return view('encomiendas.ver', compact('encomienda', 'historial', 'categoria', 'estante', 'totalMovimientos'));
     }
 
     // Cambiar estado — llama al procedimiento PL/pgSQL
