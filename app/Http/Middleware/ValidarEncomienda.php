@@ -31,7 +31,7 @@ class ValidarEncomienda
                     }
 
                     $volumen = $largo * $ancho * $alto;
-                    if ($volumen > 500000) {
+                    if ($volumen > 768000) {
                         return back()->withErrors(['dimensiones' => 'Las dimensiones superan el volumen máximo permitido (120x80x80 cm).'])->withInput();
                     }
                 }
