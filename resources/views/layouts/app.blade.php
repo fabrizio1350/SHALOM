@@ -4,167 +4,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Shalom — @yield('titulo')</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        :root {
+            --red:      #E8272A;
+            --red-dark: #C0201E;
+            --red-light:#FFF0F0;
+            --dark:     #1A1A2E;
+            --gray:     #F4F6F9;
+            --text:     #2D3436;
+            --muted:    #636E72;
+            --white:    #FFFFFF;
+            --shadow:   0 4px 20px rgba(0,0,0,0.08);
+            --radius:   12px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',Arial,sans-serif; background:var(--gray); color:var(--text); }
 
-        /* ── NAVBAR ── */
+        /* ══ NAVBAR ══ */
         .navbar {
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-            color: white; padding: 0 30px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            min-height: 60px;
+            background:var(--white);
+            border-bottom: 3px solid var(--red);
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+            box-shadow: 0 2px 12px rgba(232,39,42,0.12);
+            position: sticky;
+            top: 0;
+            z-index: 999;
         }
         .navbar-brand {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 20px; font-weight: bold; color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             text-decoration: none;
         }
-        .navbar-brand span {
-            background: #f39c12; color: white;
-            padding: 4px 10px; border-radius: 20px;
-            font-size: 12px; font-weight: bold;
+        .navbar-brand-icon {
+            background: var(--red);
+            color: white;
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
         }
-        .navbar-links { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .navbar-brand-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.5px;
+        }
+        .navbar-brand-text span {
+            color: var(--red);
+        }
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
         .navbar-links a {
-            color: white; text-decoration: none;
-            padding: 8px 14px; border-radius: 4px;
-            font-size: 14px; transition: background 0.2s;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .navbar-links a:hover { background: rgba(255,255,255,0.2); }
-        .navbar-right { display: flex; align-items: center; gap: 10px; }
+        .navbar-links a:hover {
+            background: var(--red-light);
+            color: var(--red);
+        }
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         .navbar-user {
-            color: white; font-size: 13px;
-            background: rgba(255,255,255,0.15);
-            padding: 6px 12px; border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gray);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
         }
+        .navbar-user-dot {
+            width: 8px; height: 8px;
+            background: #27AE60;
+            border-radius: 50%;
+        }
+        .btn-logout {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-logout:hover { background: var(--red-dark); }
 
-        /* ── CONTAINER ── */
-        .container { max-width: 1200px; margin: 25px auto; padding: 0 20px; }
+        /* ══ CONTAINER ══ */
+        .container { max-width: 1200px; margin: 28px auto; padding: 0 24px; }
 
-        /* ── CARD ── */
+        /* ══ CARD ══ */
         .card {
-            background: white; border-radius: 10px;
-            padding: 25px; margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-top: 3px solid #e74c3c;
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.04);
         }
 
-        /* ── BOTONES ── */
+        /* ══ BOTONES ══ */
         .btn {
-            padding: 8px 18px; border: none; border-radius: 5px;
-            cursor: pointer; text-decoration: none; display: inline-block;
-            font-size: 14px; font-weight: bold; transition: opacity 0.2s;
+            padding: 9px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
         }
-        .btn:hover { opacity: 0.85; }
-        .btn-primary { background: #e74c3c; color: white; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-danger  { background: #c0392b; color: white; }
-        .btn-warning { background: #f39c12; color: white; }
-        .btn-secondary { background: #7f8c8d; color: white; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-primary   { background: var(--red);    color: white; }
+        .btn-success   { background: #27AE60;        color: white; }
+        .btn-danger    { background: var(--red-dark); color: white; }
+        .btn-warning   { background: #F39C12;        color: white; }
+        .btn-secondary { background: #636E72;        color: white; }
 
-        /* ── TABLA ── */
+        /* ══ TABLA ══ */
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #ecf0f1; }
-        th { background: linear-gradient(135deg, #c0392b, #e74c3c); color: white; font-size: 13px; }
-        tr:hover { background: #fef9f9; }
+        th {
+            background: linear-gradient(135deg, var(--red-dark), var(--red));
+            color: white;
+            padding: 13px 14px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        th:first-child { border-radius: 8px 0 0 0; }
+        th:last-child  { border-radius: 0 8px 0 0; }
+        td { padding: 13px 14px; border-bottom: 1px solid #F0F3F7; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--red-light); }
 
-        /* ── ALERTAS ── */
+        /* ══ ALERTAS ══ */
         .alert-success {
-            background: #d5f5e3; color: #1e8449;
-            padding: 12px 15px; border-radius: 6px;
-            margin-bottom: 15px; border-left: 4px solid #27ae60;
+            background: #EAFAF1;
+            color: #1E8449;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            border-left: 4px solid #27AE60;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .alert-error {
-            background: #fadbd8; color: #922b21;
-            padding: 12px 15px; border-radius: 6px;
-            margin-bottom: 15px; border-left: 4px solid #e74c3c;
+            background: #FDEDEC;
+            color: #922B21;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            border-left: 4px solid var(--red);
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        /* ── BADGES ── */
+        /* ══ BADGES ══ */
         .badge {
-            padding: 4px 10px; border-radius: 12px;
-            font-size: 11px; font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .badge-recibido        { background: #17a2b8; color: white; }
-        .badge-clasificado     { background: #2980b9; color: white; }
-        .badge-en_espera       { background: #f39c12; color: white; }
-        .badge-despachado      { background: #27ae60; color: white; }
-        .badge-daniado         { background: #e74c3c; color: white; }
-        .badge-tiempo_excedido { background: #8e44ad; color: white; }
+        .badge-recibido        { background: #D6EAF8; color: #1A5276; }
+        .badge-clasificado     { background: #D6EAF8; color: #1F618D; }
+        .badge-en_espera       { background: #FEF9E7; color: #9A7D0A; }
+        .badge-despachado      { background: #EAFAF1; color: #1E8449; }
+        .badge-daniado         { background: #FDEDEC; color: #922B21; }
+        .badge-tiempo_excedido { background: #F5EEF8; color: #6C3483; }
 
-        /* ── FORMULARIOS ── */
+        /* ══ FORMULARIOS ══ */
         input, select, textarea {
-            width: 100%; padding: 10px 12px;
-            border: 1px solid #ddd; border-radius: 6px;
-            margin-bottom: 15px; font-size: 14px;
-            transition: border-color 0.2s;
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #DFE6E9;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: white;
         }
         input:focus, select:focus, textarea:focus {
-            border-color: #e74c3c; outline: none;
-            box-shadow: 0 0 0 2px rgba(231,76,60,0.1);
+            border-color: var(--red);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232,39,42,0.1);
         }
-        label { font-weight: bold; margin-bottom: 5px; display: block; color: #2c3e50; }
+        label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            color: var(--text);
+            font-size: 13px;
+        }
         .form-group { margin-bottom: 18px; }
 
-        /* ── RESPONSIVE ── */
+        /* ══ RESPONSIVE ══ */
         @media (max-width: 768px) {
-            .navbar { flex-direction: column; padding: 10px 15px; gap: 8px; }
-            .navbar-links { justify-content: center; }
-            .navbar-right { justify-content: center; }
-            .container { padding: 0 10px; margin: 15px auto; }
-            .card { padding: 15px; }
+            .navbar { flex-wrap: wrap; height: auto; padding: 10px 15px; gap: 8px; }
+            .navbar-links { justify-content: center; flex-wrap: wrap; }
+            .container { padding: 0 12px; margin: 16px auto; }
+            .card { padding: 16px; }
             table { font-size: 12px; }
-            th, td { padding: 8px 6px; }
-            .btn { padding: 6px 12px; font-size: 13px; }
+            th, td { padding: 10px 8px; }
         }
         @media (max-width: 480px) {
-            .navbar-links a { padding: 6px 8px; font-size: 12px; }
+            .navbar-links a { padding: 6px 10px; font-size: 12px; }
             table { display: block; overflow-x: auto; }
+            .btn { padding: 8px 14px; font-size: 13px; }
         }
     </style>
 </head>
 <body>
-    @auth
-    <nav class="navbar">
-        <a href="{{ route('encomiendas.index') }}" class="navbar-brand">
-            🚚 Shalom <span>ALMACÉN</span>
-        </a>
-        <div class="navbar-links">
-            <a href="{{ route('encomiendas.index') }}">📦 Encomiendas</a>
-            @if(auth()->user()->rol === 'supervisor')
-                <a href="{{ route('alertas.index') }}">🔔 Alertas</a>
-                <a href="{{ route('reportes.index') }}">📊 Reportes</a>
-            @endif
-            @if(auth()->user()->rol === 'administrador')
-                <a href="{{ route('zonas.index') }}">🏢 Zonas</a>
-                <a href="{{ route('usuarios.index') }}">👥 Usuarios</a>
-                <a href="{{ route('configuracion') }}">⚙️ Config</a>
-            @endif
-            @if(auth()->user()->rol === 'operario' || auth()->user()->rol === 'administrador')
-                <a href="{{ route('almacen') }}">🏭 Almacén 2D</a>
-            @endif
-        </div>
-        <div class="navbar-right">
-            <span class="navbar-user">👤 {{ auth()->user()->name }} · {{ auth()->user()->rol }}</span>
-            <form action="{{ route('logout') }}" method="POST" style="display:inline">
-                @csrf
-                <button type="submit" class="btn btn-danger">Salir</button>
-            </form>
-        </div>
-    </nav>
-    @endauth
 
-    <div class="container">
-        @if(session('success'))
-            <div class="alert-success">✅ {{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="alert-error">❌ {{ session('error') }}</div>
-        @endif
+@auth
+<nav class="navbar">
+    <a href="{{ route('encomiendas.index') }}" class="navbar-brand">
+        <div class="navbar-brand-icon">🚚</div>
+        <span class="navbar-brand-text">Sha<span>lom</span></span>
+    </a>
 
-        @yield('contenido')
+    <div class="navbar-links">
+        <a href="{{ route('encomiendas.index') }}">📦 Encomiendas</a>
+        @if(auth()->user()->rol === 'supervisor')
+            <a href="{{ route('alertas.index') }}">🔔 Alertas</a>
+            <a href="{{ route('reportes.index') }}">📊 Reportes</a>
+        @endif
+        @if(auth()->user()->rol === 'administrador')
+            <a href="{{ route('zonas.index') }}">🏢 Zonas</a>
+            <a href="{{ route('usuarios.index') }}">👥 Usuarios</a>
+            <a href="{{ route('configuracion') }}">⚙️ Config</a>
+        @endif
+        @if(auth()->user()->rol === 'operario' || auth()->user()->rol === 'administrador')
+            <a href="{{ route('almacen') }}">🏭 Almacén 2D</a>
+        @endif
     </div>
+
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <div class="navbar-user-dot"></div>
+            {{ auth()->user()->name }}
+            <span style="color:var(--muted); font-weight:400">· {{ auth()->user()->rol }}</span>
+        </div>
+        <form action="{{ route('logout') }}" method="POST" style="display:inline">
+            @csrf
+            <button type="submit" class="btn-logout">Salir</button>
+        </form>
+    </div>
+</nav>
+@endauth
+
+<div class="container">
+    @if(session('success'))
+        <div class="alert-success">✅ {{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert-error">❌ {{ session('error') }}</div>
+    @endif
+    @yield('contenido')
+</div>
+
 </body>
 </html>
