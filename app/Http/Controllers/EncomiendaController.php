@@ -9,18 +9,39 @@ use App\Models\Encomienda;
 use App\Models\Zona;
 use App\DataStructures\HistorialStack;
 use App\DataStructures\ClasificacionTree;
+use App\DataStructures\BinarySearchTree;
 
 class EncomiendaController extends Controller
 {
     // Listar encomiendas (dashboard)
-    public function index()
+// Listar encomiendas con BST para búsqueda por nombre
+    public function index(Request $request)
     {
+        $busqueda    = $request->get('busqueda');
         $encomiendas = Encomienda::with('zona')
                         ->orderBy('fecha_ingreso', 'desc')
                         ->get();
-        return view('encomiendas.index', compact('encomiendas'));
-    }
 
+        // Construir BST con todas las encomiendas ordenadas por nombre remitente
+        $bst = new BinarySearchTree();
+        foreach ($encomiendas as $enc) {
+            $bst->insertar($enc->remitente, $enc->id_encomienda, $enc->toArray());
+        }
+
+        // Si hay búsqueda usar BST, si no mostrar inorden (orden alfabético)
+        if ($busqueda) {
+            $resultado   = $bst->buscar($busqueda);
+            $encomiendas = collect($resultado);
+        } else {
+            $encomiendas = Encomienda::with('zona')
+                            ->orderBy('fecha_ingreso', 'desc')
+                            ->get();
+        }
+
+        $totalBST = $bst->totalNodos();
+
+        return view('encomiendas.index', compact('encomiendas', 'busqueda', 'totalBST'));
+    }
     // Formulario registrar encomienda
     public function crear()
     {
