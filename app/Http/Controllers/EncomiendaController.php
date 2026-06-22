@@ -58,7 +58,7 @@ class EncomiendaController extends Controller
             'peso'           => 'required|numeric|min:0.1|max:70',
             'dimensiones'    => ['nullable', 'string', 'max:50', 'regex:/^\d+x\d+x\d+$/'],
             'descripcion'    => 'nullable|string|max:500',
-            'imagen'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'imagen' => 'nullable|file|max:2048'
         ], [
             'remitente.regex'   => 'El remitente solo puede contener letras.',
             'destinatario.regex'=> 'El destinatario solo puede contener letras.',
