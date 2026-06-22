@@ -19,6 +19,7 @@ class Encomienda extends Model
         'peso',
         'dimensiones',
         'descripcion',
+        'imagen',
         'estado',
         'id_zona',
         'fecha_ingreso'

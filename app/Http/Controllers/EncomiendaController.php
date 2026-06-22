@@ -13,8 +13,7 @@ use App\DataStructures\BinarySearchTree;
 
 class EncomiendaController extends Controller
 {
-    // Listar encomiendas (dashboard)
-// Listar encomiendas con BST para búsqueda por nombre
+    // Listar encomiendas con BST para búsqueda por nombre
     public function index(Request $request)
     {
         $busqueda    = $request->get('busqueda');
@@ -22,13 +21,11 @@ class EncomiendaController extends Controller
                         ->orderBy('fecha_ingreso', 'desc')
                         ->get();
 
-        // Construir BST con todas las encomiendas ordenadas por nombre remitente
         $bst = new BinarySearchTree();
         foreach ($encomiendas as $enc) {
             $bst->insertar($enc->remitente, $enc->id_encomienda, $enc->toArray());
         }
 
-        // Si hay búsqueda usar BST, si no mostrar inorden (orden alfabético)
         if ($busqueda) {
             $resultado   = $bst->buscar($busqueda);
             $encomiendas = collect($resultado);
@@ -39,9 +36,9 @@ class EncomiendaController extends Controller
         }
 
         $totalBST = $bst->totalNodos();
-
         return view('encomiendas.index', compact('encomiendas', 'busqueda', 'totalBST'));
     }
+
     // Formulario registrar encomienda
     public function crear()
     {
@@ -50,6 +47,7 @@ class EncomiendaController extends Controller
                      ->get();
         return view('encomiendas.crear', compact('zonas'));
     }
+
     // Registrar encomienda — llama al procedimiento PL/pgSQL
     public function registrar(Request $request)
     {
@@ -59,15 +57,24 @@ class EncomiendaController extends Controller
             'ciudad_destino' => 'required|in:Abancay,Arequipa,Ayacucho,Bagua,Cajamarca,Callao,Chiclayo,Chimbote,Cusco,Huancayo,Huanuco,Huaraz,Ica,Ilo,Iquitos,Juliaca,Lima,Moquegua,Moyobamba,Nazca,Piura,Pucallpa,Puerto Maldonado,Puno,Sullana,Tacna,Tarapoto,Tarma,Trujillo,Tumbes,Yurimaguas',
             'peso'           => 'required|numeric|min:0.1|max:70',
             'dimensiones'    => ['nullable', 'string', 'max:50', 'regex:/^\d+x\d+x\d+$/'],
-            'descripcion'    => 'nullable|string|max:500'
+            'descripcion'    => 'nullable|string|max:500',
+            'imagen'         => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ], [
-            'remitente.regex'        => 'El remitente solo puede contener letras.',
-            'destinatario.regex'     => 'El destinatario solo puede contener letras.',
-            'ciudad_destino.in'      => 'Selecciona una ciudad válida.',
-            'peso.min'               => 'El peso mínimo es 0.1 kg.',
-            'peso.max'               => 'El peso máximo es 70 kg.',
-            'dimensiones.regex'      => 'Las dimensiones deben tener formato LxAxH (ej: 30x20x15).',
+            'remitente.regex'   => 'El remitente solo puede contener letras.',
+            'destinatario.regex'=> 'El destinatario solo puede contener letras.',
+            'ciudad_destino.in' => 'Selecciona una ciudad válida.',
+            'peso.min'          => 'El peso mínimo es 0.1 kg.',
+            'peso.max'          => 'El peso máximo es 70 kg.',
+            'dimensiones.regex' => 'Las dimensiones deben tener formato LxAxH (ej: 30x20x15).',
+            'imagen.mimes'      => 'Solo se permiten imágenes JPG o PNG.',
+            'imagen.max'        => 'La imagen no puede superar 2MB.',
         ]);
+
+        // Guardar imagen si se subió
+        $rutaImagen = null;
+        if ($request->hasFile('imagen')) {
+            $rutaImagen = $request->file('imagen')->store('encomiendas', 'public');
+        }
 
         // Usar ClasificacionTree para clasificar el paquete
         $tree      = new ClasificacionTree();
@@ -85,28 +92,31 @@ class EncomiendaController extends Controller
             Auth::id()
         ]);
 
+        // Guardar imagen en la encomienda recién creada
+        if ($rutaImagen) {
+            $ultimaEncomienda = Encomienda::latest('fecha_ingreso')->first();
+            $ultimaEncomienda->imagen = $rutaImagen;
+            $ultimaEncomienda->save();
+        }
+
         return redirect()->route('encomiendas.index')
             ->with('success', "Encomienda registrada — Categoría: $categoria, Estante: $estante");
     }
+
     // Ver detalle de encomienda
     public function ver($id)
     {
         $encomienda = Encomienda::with('zona')->findOrFail($id);
 
-        // Obtener historial via función PL/pgSQL
-        $historialRaw = DB::select('SELECT * FROM obtener_historial_encomienda(?)', [$id]);
-
-        // Usar modelo HistorialMovimiento para estadísticas
+        $historialRaw     = DB::select('SELECT * FROM obtener_historial_encomienda(?)', [$id]);
         $totalMovimientos = \App\Models\HistorialMovimiento::where('id_encomienda', $id)->count();
 
-        // Usar HistorialStack para ordenar más reciente primero
         $stack = new HistorialStack();
         foreach (array_reverse($historialRaw) as $mov) {
             $stack->push((array)$mov);
         }
         $historial = $stack->toArray();
 
-        // Usar ClasificacionTree para mostrar categoría del paquete
         $tree      = new ClasificacionTree();
         $categoria = $tree->clasificar($encomienda->peso, $encomienda->dimensiones ?? '');
         $estante   = $tree->asignarEstante($encomienda->peso, $encomienda->dimensiones ?? '');
@@ -114,7 +124,7 @@ class EncomiendaController extends Controller
         return view('encomiendas.ver', compact('encomienda', 'historial', 'categoria', 'estante', 'totalMovimientos'));
     }
 
-    // Cambiar estado — llama al procedimiento PL/pgSQL
+    // Cambiar estado
     public function cambiarEstado(Request $request, $id)
     {
         $request->validate([
@@ -123,26 +133,19 @@ class EncomiendaController extends Controller
         ]);
 
         DB::statement('CALL cambiar_estado_encomienda(?, ?, ?, ?)', [
-            $id,
-            $request->estado,
-            $request->observacion,
-            Auth::id()
+            $id, $request->estado, $request->observacion, Auth::id()
         ]);
 
         return redirect()->route('encomiendas.ver', $id)->with('success', 'Estado actualizado.');
     }
 
-    // Reubicar encomienda por tiempo excedido
+    // Reubicar encomienda
     public function reubicar(Request $request, $id)
     {
-        $request->validate([
-            'observacion' => 'required|string'
-        ]);
+        $request->validate(['observacion' => 'required|string']);
 
         DB::statement('CALL reubicar_encomienda(?, ?, ?)', [
-            $id,
-            $request->observacion,
-            Auth::id()
+            $id, $request->observacion, Auth::id()
         ]);
 
         return redirect()->route('encomiendas.ver', $id)->with('success', 'Encomienda reubicada correctamente.');
@@ -152,10 +155,7 @@ class EncomiendaController extends Controller
     public function despachar(Request $request, $id)
     {
         DB::statement('CALL cambiar_estado_encomienda(?, ?, ?, ?)', [
-            $id,
-            'despachado',
-            'Encomienda despachada',
-            Auth::id()
+            $id, 'despachado', 'Encomienda despachada', Auth::id()
         ]);
 
         return redirect()->route('encomiendas.index')->with('success', 'Encomienda despachada.');
@@ -164,15 +164,10 @@ class EncomiendaController extends Controller
     // Notificar daño
     public function notificarDanio(Request $request, $id)
     {
-        $request->validate([
-            'observacion' => 'required|string'
-        ]);
+        $request->validate(['observacion' => 'required|string']);
 
         DB::statement('CALL cambiar_estado_encomienda(?, ?, ?, ?)', [
-            $id,
-            'daniado',
-            $request->observacion,
-            Auth::id()
+            $id, 'daniado', $request->observacion, Auth::id()
         ]);
 
         return redirect()->route('encomiendas.ver', $id)->with('success', 'Daño registrado.');
