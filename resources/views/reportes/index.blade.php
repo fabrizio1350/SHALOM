@@ -35,7 +35,7 @@
     @endif
 
     {{-- Filtros --}}
-    <form method="GET" action="{{ route('reportes.index') }}" style="display:flex; gap:10px; margin-bottom:20px">
+    <form method="GET" action="{{ route('reportes.index') }}" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap">
         <select name="zona" style="width:auto">
             <option value="">Todas las zonas</option>
             @foreach($zonas as $zona)
@@ -53,9 +53,17 @@
             <option value="daniado" {{ $filtro_estado === 'daniado' ? 'selected' : '' }}>Dañado</option>
             <option value="tiempo_excedido" {{ $filtro_estado === 'tiempo_excedido' ? 'selected' : '' }}>Tiempo Excedido</option>
         </select>
+        <select name="orden" style="width:auto">
+            <option value="desc" {{ $filtro_orden === 'desc' ? 'selected' : '' }}>⬇ Mayor peso primero (HeapSort)</option>
+            <option value="asc" {{ $filtro_orden === 'asc' ? 'selected' : '' }}>⬆ Menor peso primero (HeapSort)</option>
+        </select>
         <button type="submit" class="btn btn-primary">Filtrar</button>
         <a href="{{ route('reportes.index') }}" class="btn btn-warning">Limpiar</a>
     </form>
+
+    <p style="color:#666; font-size:13px; margin-bottom:15px">
+        📊 Ordenado por peso usando <strong>HeapSort</strong> — O(n log n)
+    </p>
 
     {{-- Tabla --}}
     <table>
@@ -74,18 +82,18 @@
         <tbody>
             @forelse($encomiendas as $enc)
             <tr>
-                <td>{{ $enc->id_encomienda }}</td>
-                <td>{{ $enc->remitente }}</td>
-                <td>{{ $enc->destinatario }}</td>
-                <td>{{ $enc->ciudad_destino }}</td>
-                <td>{{ $enc->peso }} kg</td>
-                <td>{{ $enc->zona ? $enc->zona->nombre : 'Sin zona' }}</td>
+                <td>{{ $enc['id_encomienda'] }}</td>
+                <td>{{ $enc['remitente'] }}</td>
+                <td>{{ $enc['destinatario'] }}</td>
+                <td>{{ $enc['ciudad_destino'] }}</td>
+                <td>{{ $enc['peso'] }} kg</td>
+                <td>{{ $enc['zona']['nombre'] ?? 'Sin zona' }}</td>
                 <td>
-                    <span class="badge badge-{{ $enc->estado }}">
-                        {{ strtoupper(str_replace('_', ' ', $enc->estado)) }}
+                    <span class="badge badge-{{ $enc['estado'] }}">
+                        {{ strtoupper(str_replace('_', ' ', $enc['estado'])) }}
                     </span>
                 </td>
-                <td>{{ \Carbon\Carbon::parse($enc->fecha_ingreso)->format('d/m/Y H:i') }}</td>
+                <td>{{ \Carbon\Carbon::parse($enc['fecha_ingreso'])->format('d/m/Y H:i') }}</td>
             </tr>
             @empty
             <tr>
