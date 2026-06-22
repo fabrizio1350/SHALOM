@@ -7,6 +7,11 @@ use App\Http\Controllers\EncomiendaController;
 use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\ReporteController;
 
+// Ruta pública de tracking — sin autenticación
+Route::get('/tracking', function () {
+    return view('tracking');
+})->name('tracking');
+
 // Ruta raíz → redirige al login
 Route::get('/', function () {
     return redirect()->route('login');
