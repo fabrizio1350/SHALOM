@@ -35,6 +35,15 @@
     @if($encomienda->descripcion)
         <p><strong>Descripción:</strong> {{ $encomienda->descripcion }}</p>
     @endif
+
+    {{-- Imagen del paquete --}}
+    @if($encomienda->imagen)
+    <div style="margin-top:15px">
+        <strong>Imagen del paquete:</strong><br>
+        <img src="{{ asset('storage/' . $encomienda->imagen) }}"
+             style="max-width:300px; border-radius:8px; margin-top:8px; border:1px solid #ddd">
+    </div>
+    @endif
 </div>
 
 {{-- Cambiar estado --}}
