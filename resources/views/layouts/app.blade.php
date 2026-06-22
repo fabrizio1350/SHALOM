@@ -4,129 +4,220 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Shalom — @yield('titulo')</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --red:      #E8272A;
-            --red-dark: #C0201E;
-            --red-light:#FFF0F0;
-            --dark:     #1A1A2E;
-            --gray:     #F4F6F9;
-            --text:     #2D3436;
-            --muted:    #636E72;
-            --white:    #FFFFFF;
-            --shadow:   0 4px 20px rgba(0,0,0,0.08);
-            --radius:   12px;
+            --primary:      #E8272A;
+            --primary-dark: #B71C1C;
+            --primary-light:#FFF5F5;
+            --accent:       #FF6B35;
+            --dark:         #0F172A;
+            --dark2:        #1E293B;
+            --surface:      #F8FAFC;
+            --white:        #FFFFFF;
+            --border:       #E2E8F0;
+            --text:         #0F172A;
+            --muted:        #64748B;
+            --success:      #10B981;
+            --warning:      #F59E0B;
+            --info:         #3B82F6;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow:       0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg:    0 10px 40px rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.06);
+            --radius:       12px;
+            --radius-lg:    16px;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Inter',Arial,sans-serif; background:var(--gray); color:var(--text); }
 
-        /* ══ NAVBAR ══ */
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ══════════════════════════════════════
+           NAVBAR
+        ══════════════════════════════════════ */
         .navbar {
-            background:var(--white);
-            border-bottom: 3px solid var(--red);
-            padding: 0 30px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 64px;
-            box-shadow: 0 2px 12px rgba(232,39,42,0.12);
+            height: 68px;
             position: sticky;
             top: 0;
-            z-index: 999;
+            z-index: 1000;
+            box-shadow: 0 1px 20px rgba(232,39,42,0.08);
         }
+
+        /* Línea roja animada arriba del navbar */
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
         .navbar-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
         }
-        .navbar-brand-icon {
-            background: var(--red);
-            color: white;
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px;
+        .brand-logo {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(232,39,42,0.35);
         }
-        .navbar-brand-text {
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .brand-name {
             font-size: 18px;
             font-weight: 800;
             color: var(--dark);
             letter-spacing: -0.5px;
+            line-height: 1;
         }
-        .navbar-brand-text span {
-            color: var(--red);
+        .brand-name span { color: var(--primary); }
+        .brand-sub {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         .navbar-links {
             display: flex;
             align-items: center;
             gap: 2px;
         }
-        .navbar-links a {
+        .nav-link {
             color: var(--muted);
             text-decoration: none;
             padding: 8px 14px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.18s ease;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            white-space: nowrap;
         }
-        .navbar-links a:hover {
-            background: var(--red-light);
-            color: var(--red);
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            transform: translateY(-1px);
         }
+        .nav-link i { font-size: 13px; }
+
         .navbar-right {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
-        .navbar-user {
+        .user-pill {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--gray);
-            padding: 6px 14px;
-            border-radius: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 40px;
             font-size: 13px;
             font-weight: 600;
             color: var(--text);
+            cursor: default;
         }
-        .navbar-user-dot {
-            width: 8px; height: 8px;
-            background: #27AE60;
+        .user-avatar {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .user-role {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .btn-logout {
-            background: var(--red);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 9px 18px;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            font-family: inherit;
+            transition: all 0.18s;
+            box-shadow: 0 2px 8px rgba(232,39,42,0.3);
         }
-        .btn-logout:hover { background: var(--red-dark); }
+        .btn-logout:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(232,39,42,0.4);
+        }
 
-        /* ══ CONTAINER ══ */
-        .container { max-width: 1200px; margin: 28px auto; padding: 0 24px; }
+        /* ══════════════════════════════════════
+           CONTENIDO
+        ══════════════════════════════════════ */
+        .container { max-width: 1240px; margin: 28px auto; padding: 0 24px; }
 
-        /* ══ CARD ══ */
+        /* ══════════════════════════════════════
+           CARDS
+        ══════════════════════════════════════ */
         .card {
             background: var(--white);
-            border-radius: var(--radius);
-            padding: 28px;
+            border-radius: var(--radius-lg);
+            padding: 28px 32px;
             margin-bottom: 20px;
             box-shadow: var(--shadow);
-            border: 1px solid rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
         }
 
-        /* ══ BOTONES ══ */
+        /* ══════════════════════════════════════
+           BOTONES
+        ══════════════════════════════════════ */
         .btn {
             padding: 9px 20px;
             border: none;
@@ -135,118 +226,191 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            font-size: 14px;
+            gap: 7px;
+            font-size: 13.5px;
             font-weight: 600;
             font-family: inherit;
-            transition: all 0.2s;
+            transition: all 0.18s ease;
+            white-space: nowrap;
         }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .btn-primary   { background: var(--red);    color: white; }
-        .btn-success   { background: #27AE60;        color: white; }
-        .btn-danger    { background: var(--red-dark); color: white; }
-        .btn-warning   { background: #F39C12;        color: white; }
-        .btn-secondary { background: #636E72;        color: white; }
-
-        /* ══ TABLA ══ */
-        table { width: 100%; border-collapse: collapse; }
-        th {
-            background: linear-gradient(135deg, var(--red-dark), var(--red));
+        .btn:hover { transform: translateY(-1px); }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 13px 14px;
+            box-shadow: 0 2px 8px rgba(232,39,42,0.3);
+        }
+        .btn-primary:hover { box-shadow: 0 4px 16px rgba(232,39,42,0.4); }
+        .btn-success {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+        }
+        .btn-success:hover { box-shadow: 0 4px 16px rgba(16,185,129,0.4); }
+        .btn-danger {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            color: white;
+            box-shadow: 0 2px 8px rgba(239,68,68,0.3);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+        }
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { background: var(--border); color: var(--text); }
+
+        /* ══════════════════════════════════════
+           TABLA
+        ══════════════════════════════════════ */
+        .table-wrapper { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: linear-gradient(135deg, var(--dark), var(--dark2)); }
+        th {
+            color: rgba(255,255,255,0.9);
+            padding: 14px 16px;
             text-align: left;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
-        th:first-child { border-radius: 8px 0 0 0; }
-        th:last-child  { border-radius: 0 8px 0 0; }
-        td { padding: 13px 14px; border-bottom: 1px solid #F0F3F7; font-size: 14px; }
+        td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13.5px;
+            color: var(--text);
+        }
         tr:last-child td { border-bottom: none; }
-        tr:hover td { background: var(--red-light); }
+        tbody tr { transition: background 0.15s; }
+        tbody tr:hover td { background: var(--primary-light); }
 
-        /* ══ ALERTAS ══ */
+        /* ══════════════════════════════════════
+           ALERTAS SISTEMA
+        ══════════════════════════════════════ */
         .alert-success {
-            background: #EAFAF1;
-            color: #1E8449;
+            background: #F0FDF4;
+            color: #166534;
             padding: 14px 18px;
             border-radius: 10px;
-            margin-bottom: 18px;
-            border-left: 4px solid #27AE60;
+            margin-bottom: 20px;
+            border: 1px solid #BBF7D0;
+            border-left: 4px solid var(--success);
             font-size: 14px;
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
         }
         .alert-error {
-            background: #FDEDEC;
-            color: #922B21;
+            background: #FFF5F5;
+            color: #9B1C1C;
             padding: 14px 18px;
             border-radius: 10px;
-            margin-bottom: 18px;
-            border-left: 4px solid var(--red);
+            margin-bottom: 20px;
+            border: 1px solid #FED7D7;
+            border-left: 4px solid var(--primary);
             font-size: 14px;
             font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity:0; transform: translateY(-8px); }
+            to   { opacity:1; transform: translateY(0); }
         }
 
-        /* ══ BADGES ══ */
+        /* ══════════════════════════════════════
+           BADGES
+        ══════════════════════════════════════ */
         .badge {
-            padding: 5px 12px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
+            display: inline-block;
         }
-        .badge-recibido        { background: #D6EAF8; color: #1A5276; }
-        .badge-clasificado     { background: #D6EAF8; color: #1F618D; }
-        .badge-en_espera       { background: #FEF9E7; color: #9A7D0A; }
-        .badge-despachado      { background: #EAFAF1; color: #1E8449; }
-        .badge-daniado         { background: #FDEDEC; color: #922B21; }
-        .badge-tiempo_excedido { background: #F5EEF8; color: #6C3483; }
+        .badge-recibido        { background:#DBEAFE; color:#1D4ED8; }
+        .badge-clasificado     { background:#EDE9FE; color:#5B21B6; }
+        .badge-en_espera       { background:#FEF3C7; color:#92400E; }
+        .badge-despachado      { background:#D1FAE5; color:#065F46; }
+        .badge-daniado         { background:#FEE2E2; color:#991B1B; }
+        .badge-tiempo_excedido { background:#F3E8FF; color:#6B21A8; }
 
-        /* ══ FORMULARIOS ══ */
+        /* ══════════════════════════════════════
+           FORMULARIOS
+        ══════════════════════════════════════ */
         input, select, textarea {
             width: 100%;
             padding: 10px 14px;
-            border: 1.5px solid #DFE6E9;
+            border: 1.5px solid var(--border);
             border-radius: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 0;
             font-size: 14px;
             font-family: inherit;
             color: var(--text);
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background: white;
+            background: var(--white);
+            transition: all 0.18s;
         }
         input:focus, select:focus, textarea:focus {
-            border-color: var(--red);
+            border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(232,39,42,0.1);
+            box-shadow: 0 0 0 3px rgba(232,39,42,0.08);
         }
+        input::placeholder, textarea::placeholder { color: #CBD5E1; }
         label {
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 7px;
             display: block;
-            color: var(--text);
+            color: var(--dark2);
             font-size: 13px;
         }
-        .form-group { margin-bottom: 18px; }
+        .form-group { margin-bottom: 20px; }
 
-        /* ══ RESPONSIVE ══ */
-        @media (max-width: 768px) {
-            .navbar { flex-wrap: wrap; height: auto; padding: 10px 15px; gap: 8px; }
-            .navbar-links { justify-content: center; flex-wrap: wrap; }
-            .container { padding: 0 12px; margin: 16px auto; }
-            .card { padding: 16px; }
-            table { font-size: 12px; }
-            th, td { padding: 10px 8px; }
+        /* ══════════════════════════════════════
+           STATS CARDS
+        ══════════════════════════════════════ */
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        @media (max-width: 480px) {
-            .navbar-links a { padding: 6px 10px; font-size: 12px; }
-            table { display: block; overflow-x: auto; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            opacity: 0.06;
+        }
+        .stat-number { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+        .stat-label  { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.75; }
+        .stat-icon   { font-size: 28px; position: absolute; top: 16px; right: 16px; opacity: 0.2; }
+
+        /* ══════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .navbar { flex-wrap: wrap; height: auto; padding: 12px 16px; gap: 10px; }
+            .navbar-links { justify-content: center; flex-wrap: wrap; order: 3; width: 100%; }
+            .container { padding: 0 16px; margin: 16px auto; }
+        }
+        @media (max-width: 560px) {
+            .card { padding: 18px; }
+            .nav-link { padding: 7px 10px; font-size: 12px; }
             .btn { padding: 8px 14px; font-size: 13px; }
+            .stat-number { font-size: 26px; }
         }
     </style>
 </head>
@@ -255,35 +419,54 @@
 @auth
 <nav class="navbar">
     <a href="{{ route('encomiendas.index') }}" class="navbar-brand">
-        <div class="navbar-brand-icon">🚚</div>
-        <span class="navbar-brand-text">Sha<span>lom</span></span>
+        <div class="brand-logo">🚚</div>
+        <div class="brand-text">
+            <span class="brand-name">Sha<span>lom</span></span>
+            <span class="brand-sub">Sistema de Almacén</span>
+        </div>
     </a>
 
     <div class="navbar-links">
-        <a href="{{ route('encomiendas.index') }}">📦 Encomiendas</a>
+        <a href="{{ route('encomiendas.index') }}" class="nav-link">
+            <i class="fas fa-box"></i> Encomiendas
+        </a>
         @if(auth()->user()->rol === 'supervisor')
-            <a href="{{ route('alertas.index') }}">🔔 Alertas</a>
-            <a href="{{ route('reportes.index') }}">📊 Reportes</a>
+            <a href="{{ route('alertas.index') }}" class="nav-link">
+                <i class="fas fa-bell"></i> Alertas
+            </a>
+            <a href="{{ route('reportes.index') }}" class="nav-link">
+                <i class="fas fa-chart-bar"></i> Reportes
+            </a>
         @endif
         @if(auth()->user()->rol === 'administrador')
-            <a href="{{ route('zonas.index') }}">🏢 Zonas</a>
-            <a href="{{ route('usuarios.index') }}">👥 Usuarios</a>
-            <a href="{{ route('configuracion') }}">⚙️ Config</a>
+            <a href="{{ route('zonas.index') }}" class="nav-link">
+                <i class="fas fa-warehouse"></i> Zonas
+            </a>
+            <a href="{{ route('usuarios.index') }}" class="nav-link">
+                <i class="fas fa-users"></i> Usuarios
+            </a>
+            <a href="{{ route('configuracion') }}" class="nav-link">
+                <i class="fas fa-cog"></i> Config
+            </a>
         @endif
         @if(auth()->user()->rol === 'operario' || auth()->user()->rol === 'administrador')
-            <a href="{{ route('almacen') }}">🏭 Almacén 2D</a>
+            <a href="{{ route('almacen') }}" class="nav-link">
+                <i class="fas fa-industry"></i> Almacén 2D
+            </a>
         @endif
     </div>
 
     <div class="navbar-right">
-        <div class="navbar-user">
-            <div class="navbar-user-dot"></div>
+        <div class="user-pill">
+            <div class="user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
             {{ auth()->user()->name }}
-            <span style="color:var(--muted); font-weight:400">· {{ auth()->user()->rol }}</span>
+            <span class="user-role">{{ auth()->user()->rol }}</span>
         </div>
         <form action="{{ route('logout') }}" method="POST" style="display:inline">
             @csrf
-            <button type="submit" class="btn-logout">Salir</button>
+            <button type="submit" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
         </form>
     </div>
 </nav>
@@ -291,10 +474,16 @@
 
 <div class="container">
     @if(session('success'))
-        <div class="alert-success">✅ {{ session('success') }}</div>
+        <div class="alert-success">
+            <i class="fas fa-check-circle" style="color:#10B981; font-size:16px"></i>
+            {{ session('success') }}
+        </div>
     @endif
     @if(session('error'))
-        <div class="alert-error">❌ {{ session('error') }}</div>
+        <div class="alert-error">
+            <i class="fas fa-exclamation-circle" style="color:var(--primary); font-size:16px"></i>
+            {{ session('error') }}
+        </div>
     @endif
     @yield('contenido')
 </div>
