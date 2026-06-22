@@ -43,14 +43,19 @@
                     @endphp
                     <div style="position:relative; display:inline-block">
                         <a href="{{ route('encomiendas.ver', $paquete['id_encomienda']) }}"
-                           style="display:flex; align-items:center; justify-content:center;
-                                  width:{{ $w }}px; height:{{ $h }}px;
-                                  background:{{ $paquete['estado'] === 'tiempo_excedido' ? '#6f42c1' : 
-                                              ($paquete['estado'] === 'daniado' ? '#dc3545' : '#007bff') }};
-                                  color:white; border-radius:4px; font-size:9px;
-                                  text-decoration:none; text-align:center; padding:2px;
-                                  border:1px solid rgba(0,0,0,0.2)">
-                            {{ substr($paquete['id_encomienda'], -3) }}
+                        style="display:flex; align-items:center; justify-content:center;
+                                width:{{ $w }}px; height:{{ $h }}px;
+                                background:{{ $paquete['estado'] === 'tiempo_excedido' ? '#6f42c1' : 
+                                            ($paquete['estado'] === 'daniado' ? '#dc3545' : '#007bff') }};
+                                color:white; border-radius:4px; font-size:9px;
+                                text-decoration:none; text-align:center; padding:2px;
+                                border:1px solid rgba(0,0,0,0.2); overflow:hidden; position:relative"
+                        title="{{ $paquete['id_encomienda'] }} | {{ $paquete['remitente'] }} | {{ $paquete['peso'] }}kg">
+                            @if(!empty($paquete['imagen']))
+                                <img src="{{ asset('storage/' . $paquete['imagen']) }}"
+                                    style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.6">
+                            @endif
+                            <span style="position:relative; z-index:1">{{ substr($paquete['id_encomienda'], -3) }}</span>
                         </a>
                         <div style="display:none; position:absolute; bottom:110%; left:50%; transform:translateX(-50%);
                                     background:white; border:1px solid #ddd; border-radius:8px; padding:8px;
