@@ -37,19 +37,6 @@ class ValidarEncomienda
                     }
                 }
             }
-            // Validar imagen si se subió
-            if ($request->hasFile('imagen')) {
-                $imagen    = $request->file('imagen');
-                $mimeType  = $imagen->getMimeType();
-
-                if (!in_array($mimeType, ['image/jpeg', 'image/jpg', 'image/png'])) {
-                    return back()->withErrors(['imagen' => 'Solo se permiten imágenes JPG o PNG.'])->withInput();
-                }
-
-                if ($imagen->getSize() > 2 * 1024 * 1024) {
-                    return back()->withErrors(['imagen' => 'La imagen no puede superar 2MB.'])->withInput();
-                }
-            }
         }
 
         return $next($request);
