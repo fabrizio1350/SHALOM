@@ -59,7 +59,18 @@
     @endif
 </div>
 
-{{-- Cambiar estado --}}
+{{-- Aviso tiempo excedido para operario — debe esperar al supervisor --}}
+@if($encomienda->estado === 'tiempo_excedido' && auth()->user()->rol === 'operario')
+<div class="card" style="border-left:4px solid #8e44ad; background:#f9f0ff">
+    <h3 style="margin-bottom:10px; color:#8e44ad">⏰ Encomienda con Tiempo Excedido</h3>
+    <p style="color:#666; font-size:14px">
+        Esta encomienda ha superado el tiempo máximo de almacenamiento.<br>
+        <strong>El supervisor debe resolver la alerta primero</strong> para que puedas proceder con la reubicación.
+    </p>
+</div>
+@endif
+
+{{-- Cambiar estado — no mostrar si tiempo_excedido ni despachado --}}
 @if($encomienda->estado !== 'despachado' && $encomienda->estado !== 'tiempo_excedido' && auth()->user()->rol !== 'supervisor')
 <div class="card">
     <h3 style="margin-bottom:15px; color:#2c3e50">🔄 Cambiar Estado</h3>
@@ -87,25 +98,27 @@
 </div>
 @endif
 
-{{-- Reubicar --}}
-@if($encomienda->estado === 'tiempo_excedido' && auth()->user()->rol === 'operario')
+{{-- Reubicar — solo cuando supervisor ya resolvió la alerta (estado en_espera) --}}
+@if($encomienda->estado === 'en_espera' && auth()->user()->rol === 'operario')
 <div class="card" style="border-left:4px solid #8e44ad">
-    <h3 style="margin-bottom:10px; color:#8e44ad">⚠️ Reubicar Encomienda</h3>
-    <p style="color:#666; margin-bottom:15px; font-size:14px">Esta encomienda ha excedido el tiempo máximo. Debe ser reubicada.</p>
+    <h3 style="margin-bottom:10px; color:#8e44ad">📦 Reubicar Encomienda</h3>
+    <p style="color:#666; margin-bottom:15px; font-size:14px">
+        ✅ El supervisor ha autorizado la reubicación. Por favor confirma que el paquete fue reubicado físicamente.
+    </p>
     <form action="{{ route('encomiendas.reubicar', $encomienda->id_encomienda) }}" method="POST">
         @csrf
         <input type="hidden" name="estado" value="en_espera">
         <div class="form-group">
             <label>Observación</label>
-            <textarea name="observacion" rows="2" required>Reubicación por tiempo excedido</textarea>
+            <textarea name="observacion" rows="2" required>Reubicación física completada</textarea>
         </div>
-        <button type="submit" class="btn btn-warning">📦 Reubicar Encomienda</button>
+        <button type="submit" class="btn btn-warning">📦 Confirmar Reubicación</button>
     </form>
 </div>
 @endif
 
 {{-- Notificar daño --}}
-@if($encomienda->estado !== 'despachado' && auth()->user()->rol === 'operario')
+@if($encomienda->estado !== 'despachado' && $encomienda->estado !== 'tiempo_excedido' && auth()->user()->rol === 'operario')
 <div class="card" style="border-left:4px solid #e74c3c">
     <h3 style="margin-bottom:10px; color:#e74c3c">🚨 Notificar Daño</h3>
     <form action="{{ route('encomiendas.danio', $encomienda->id_encomienda) }}" method="POST">
