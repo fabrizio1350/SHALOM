@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
         // 3. Configuracion inicial
         Configuracion::create([
             'tiempo_maximo_dias'  => 7,
+            'peso_maximo_pequeno' => 5.0,
+            'peso_maximo_mediano' => 20.0,
             'id_zona_reubicacion' => 1,
             'fecha_actualizacion' => now(),
             'id_admin'            => 1
