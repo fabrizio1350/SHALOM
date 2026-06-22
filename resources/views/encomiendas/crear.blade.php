@@ -14,7 +14,7 @@
         </div>
     @endif
 
-    <form action="{{ route('encomiendas.registrar') }}" method="POST">
+    <form action="{{ route('encomiendas.registrar') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="form-group">
             <label>Remitente</label>
@@ -72,6 +72,14 @@
         <div class="form-group">
             <label>Descripción del contenido</label>
             <textarea name="descripcion" rows="3">{{ old('descripcion') }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Imagen del paquete (opcional)</label>
+            <input type="file" name="imagen" accept=".jpg,.jpeg,.png" style="padding:5px">
+            <small style="color:#666">Formatos permitidos: JPG, PNG. Máximo 2MB.</small>
+            @error('imagen')
+                <p style="color:red; font-size:13px">{{ $message }}</p>
+            @enderror
         </div>
 
         <div style="display:flex; gap:10px">
