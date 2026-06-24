@@ -26,13 +26,9 @@ class EncomiendaController extends Controller
             $bst->insertar($enc->remitente, $enc->id_encomienda, $enc->toArray());
         }
 
+        // Si hay búsqueda usa el BST, si no reutiliza la query ya realizada
         if ($busqueda) {
-            $resultado   = $bst->buscar($busqueda);
-            $encomiendas = collect($resultado);
-        } else {
-            $encomiendas = Encomienda::with('zona')
-                            ->orderBy('fecha_ingreso', 'desc')
-                            ->get();
+            $encomiendas = collect($bst->buscar($busqueda));
         }
 
         $totalBST = $bst->totalNodos();
@@ -48,7 +44,6 @@ class EncomiendaController extends Controller
         return view('encomiendas.crear', compact('zonas'));
     }
 
-    // Registrar encomienda — llama al procedimiento PL/pgSQL
     public function registrar(Request $request)
     {
         $request->validate([
@@ -58,7 +53,7 @@ class EncomiendaController extends Controller
             'peso'           => 'required|numeric|min:0.1|max:70',
             'dimensiones'    => ['nullable', 'string', 'max:50', 'regex:/^\d+x\d+x\d+$/'],
             'descripcion'    => 'nullable|string|max:500',
-            'imagen' => 'nullable|file|max:2048'
+            'imagen'         => 'nullable|file|max:2048'
         ], [
             'remitente.regex'   => 'El remitente solo puede contener letras.',
             'destinatario.regex'=> 'El destinatario solo puede contener letras.',
@@ -93,15 +88,19 @@ class EncomiendaController extends Controller
         ]);
 
         // Guardar imagen en la encomienda recién creada
+        // Se filtra por remitente + destinatario para evitar colisiones en registros simultáneos
         if ($rutaImagen) {
-            $ultimaEncomienda = Encomienda::latest('fecha_ingreso')->first();
+            $ultimaEncomienda = Encomienda::where('remitente', $request->remitente)
+                ->where('destinatario', $request->destinatario)
+                ->latest('fecha_ingreso')
+                ->first();
             $ultimaEncomienda->imagen = $rutaImagen;
             $ultimaEncomienda->save();
         }
 
         return redirect()->route('encomiendas.index')
             ->with('success', "Encomienda registrada — Categoría: $categoria, Estante: $estante");
-    }
+    }    
 
     // Ver detalle de encomienda
     public function ver($id)
@@ -111,8 +110,10 @@ class EncomiendaController extends Controller
         $historialRaw     = DB::select('SELECT * FROM obtener_historial_encomienda(?)', [$id]);
         $totalMovimientos = \App\Models\HistorialMovimiento::where('id_encomienda', $id)->count();
 
+        // La función SQL retorna DESC (más reciente primero).
+        // push() apila en ese orden y toArray() invierte → resultado final: más reciente primero ✅
         $stack = new HistorialStack();
-        foreach (array_reverse($historialRaw) as $mov) {
+        foreach ($historialRaw as $mov) {
             $stack->push((array)$mov);
         }
         $historial = $stack->toArray();
@@ -128,7 +129,7 @@ class EncomiendaController extends Controller
     public function cambiarEstado(Request $request, $id)
     {
         $request->validate([
-            'estado'      => 'required|in:recibido,clasificado,en_espera,despachado,daniado,tiempo_excedido',
+            'estado'      => 'required|in:recibido,clasificado,en_espera,despachado,daniado',
             'observacion' => 'nullable|string'
         ]);
 

@@ -114,27 +114,17 @@ class UsuarioController extends Controller
             'id_zona_reubicacion'  => 'nullable|exists:zonas,id'
         ]);
 
-        $config = Configuracion::first();
-
-        if ($config) {
-            $config->update([
+        Configuracion::updateOrCreate(
+            ['id' => 1],
+            [
                 'tiempo_maximo_dias'  => $request->tiempo_maximo_dias,
                 'peso_maximo_pequeno' => $request->peso_maximo_pequeno,
                 'peso_maximo_mediano' => $request->peso_maximo_mediano,
                 'id_zona_reubicacion' => $request->id_zona_reubicacion,
                 'fecha_actualizacion' => now(),
                 'id_admin'            => Auth::id()
-            ]);
-        } else {
-            Configuracion::create([
-                'tiempo_maximo_dias'  => $request->tiempo_maximo_dias,
-                'peso_maximo_pequeno' => $request->peso_maximo_pequeno,
-                'peso_maximo_mediano' => $request->peso_maximo_mediano,
-                'id_zona_reubicacion' => $request->id_zona_reubicacion,
-                'fecha_actualizacion' => now(),
-                'id_admin'            => Auth::id()
-            ]);
-        }
+            ]
+        );
 
         return redirect()->route('configuracion')->with('success', 'Configuración guardada.');
     }

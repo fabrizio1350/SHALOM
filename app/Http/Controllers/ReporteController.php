@@ -43,17 +43,17 @@ class ReporteController extends Controller
         $encomiendas = collect($heap->sort('peso', $filtro_orden));
 
         // Estadisticas generales
-        $estadisticas = DB::select('
-            SELECT
-                COUNT(*) as total,
-                COUNT(CASE WHEN estado = \'recibido\' THEN 1 END) as recibidas,
-                COUNT(CASE WHEN estado = \'clasificado\' THEN 1 END) as clasificadas,
-                COUNT(CASE WHEN estado = \'en_espera\' THEN 1 END) as en_espera,
-                COUNT(CASE WHEN estado = \'despachado\' AND updated_at >= NOW() - INTERVAL \'7 days\' THEN 1 END) as despachadas,
-                COUNT(CASE WHEN estado = \'daniado\' THEN 1 END) as daniadas,
-                COUNT(CASE WHEN estado = \'tiempo_excedido\' THEN 1 END) as tiempo_excedido
-            FROM encomiendas
-        ');
+        $estadisticas = [
+            (object) [
+                'total'          => $encomiendas->count(),
+                'recibidas'      => $encomiendas->where('estado', 'recibido')->count(),
+                'clasificadas'   => $encomiendas->where('estado', 'clasificado')->count(),
+                'en_espera'      => $encomiendas->where('estado', 'en_espera')->count(),
+                'despachadas'    => $encomiendas->where('estado', 'despachado')->count(),
+                'daniadas'       => $encomiendas->where('estado', 'daniado')->count(),
+                'tiempo_excedido'=> $encomiendas->where('estado', 'tiempo_excedido')->count(),
+            ]
+        ];
 
         return view('reportes.index', compact(
             'encomiendas', 'zonas', 'estadisticas',

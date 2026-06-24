@@ -13,24 +13,23 @@ use App\DataStructures\AlertQueue;
 class AlertaController extends Controller
 {
     // Listar alertas activas usando función PL/pgSQL con cursor
-    public function index()
-    {
-        $alertasRaw = DB::select('SELECT * FROM obtener_alertas_activas()');
+public function index()
+{
+    $alertas = Alerta::with('encomienda')
+                ->where('estado', '!=', 'resuelta')
+                ->orderBy('fecha_generada', 'asc')
+                ->get();
 
-        $queue = new AlertQueue();
-        foreach ($alertasRaw as $alerta) {
-            $queue->enqueue((array)$alerta);
-        }
-
-        $total_en_cola = $queue->size();
-
-        $alertas = Alerta::with('encomienda')
-                    ->where('estado', '!=', 'resuelta')
-                    ->orderBy('fecha_generada', 'asc')
-                    ->get();
-
-        return view('alertas.index', compact('alertas', 'total_en_cola'));
+    // Cola FIFO — procesa las alertas en orden de llegada
+    $queue = new AlertQueue();
+    foreach ($alertas as $alerta) {
+        $queue->enqueue($alerta->toArray());
     }
+
+    $total_en_cola = $queue->size();
+
+    return view('alertas.index', compact('alertas', 'total_en_cola'));
+}
 
     // Atender alerta
     public function atender(Request $request, $id)

@@ -100,6 +100,7 @@
 
 {{-- Reubicar — solo cuando supervisor ya resolvió la alerta (estado en_espera) --}}
 @if($encomienda->estado === 'en_espera' && auth()->user()->rol === 'operario')
+@if($encomienda->estado === 'en_espera' && auth()->user()->rol === 'operario')
 <div class="card" style="border-left:4px solid #8e44ad">
     <h3 style="margin-bottom:10px; color:#8e44ad">📦 Reubicar Encomienda</h3>
     <p style="color:#666; margin-bottom:15px; font-size:14px">
@@ -107,7 +108,6 @@
     </p>
     <form action="{{ route('encomiendas.reubicar', $encomienda->id_encomienda) }}" method="POST">
         @csrf
-        <input type="hidden" name="estado" value="en_espera">
         <div class="form-group">
             <label>Observación</label>
             <textarea name="observacion" rows="2" required>Reubicación física completada</textarea>
