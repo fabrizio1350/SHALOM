@@ -2,6 +2,20 @@
 
 @section('titulo', 'Detalle Encomienda')
 
+@php
+function estadoLabel($estado) {
+    $map = [
+        'recibido'        => 'RECIBIDO',
+        'clasificado'     => 'CLASIFICADO',
+        'en_espera'       => 'EN ESPERA',
+        'despachado'      => 'DESPACHADO',
+        'daniado'         => 'DAÑADO',
+        'tiempo_excedido' => 'TIEMPO EXCEDIDO',
+    ];
+    return $map[$estado] ?? strtoupper(str_replace('_', ' ', $estado));
+}
+@endphp
+
 @section('contenido')
 
 {{-- Header --}}
@@ -10,7 +24,7 @@
         <div>
             <h2 style="color:#2c3e50; margin-bottom:4px">📦 {{ $encomienda->id_encomienda }}</h2>
             <span class="badge badge-{{ $encomienda->estado }}" style="font-size:13px">
-                {{ strtoupper(str_replace('_', ' ', $encomienda->estado)) }}
+                {{ estadoLabel($encomienda->estado) }}
             </span>
         </div>
         <a href="{{ route('encomiendas.index') }}" class="btn btn-secondary">← Volver</a>
@@ -70,8 +84,11 @@
 </div>
 @endif
 
-{{-- Cambiar estado — no mostrar si tiempo_excedido ni despachado --}}
-@if($encomienda->estado !== 'despachado' && $encomienda->estado !== 'tiempo_excedido' && auth()->user()->rol !== 'supervisor')
+{{-- Cambiar estado — solo para recibido, clasificado y daniado; no supervisor --}}
+@if(
+    !in_array($encomienda->estado, ['despachado', 'tiempo_excedido', 'en_espera', 'daniado'])
+    && auth()->user()->rol !== 'supervisor'
+)
 <div class="card">
     <h3 style="margin-bottom:15px; color:#2c3e50">🔄 Cambiar Estado</h3>
     <form action="{{ route('encomiendas.estado', $encomienda->id_encomienda) }}" method="POST">
@@ -83,9 +100,7 @@
                     <option value="">Seleccionar...</option>
                     <option value="recibido">Recibido</option>
                     <option value="clasificado">Clasificado</option>
-                    <option value="en_espera">En Espera</option>
                     <option value="despachado">Despachado</option>
-                    <option value="daniado">Dañado</option>
                 </select>
             </div>
             <div class="form-group" style="margin-bottom:0">
@@ -155,10 +170,10 @@
             @foreach($historial as $mov)
             <tr>
                 <td><span class="badge badge-{{ $mov['estado_anterior'] }}">
-                    {{ strtoupper(str_replace('_', ' ', $mov['estado_anterior'])) }}
+                    {{ estadoLabel($mov['estado_anterior']) }}
                 </span></td>
                 <td><span class="badge badge-{{ $mov['estado_nuevo'] }}">
-                    {{ strtoupper(str_replace('_', ' ', $mov['estado_nuevo'])) }}
+                    {{ estadoLabel($mov['estado_nuevo']) }}
                 </span></td>
                 <td style="font-size:13px">{{ $mov['observacion'] ?? '—' }}</td>
                 <td style="font-size:13px">{{ $mov['usuario'] }}</td>
