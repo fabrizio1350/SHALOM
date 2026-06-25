@@ -58,6 +58,14 @@
                 $est = is_array($enc) ? $enc['estado']         : $enc->estado;
                 $fec = is_array($enc) ? $enc['fecha_ingreso']  : $enc->fecha_ingreso;
                 $zon = is_array($enc) ? ($enc['zona']['nombre'] ?? 'Sin zona') : ($enc->zona ? $enc->zona->nombre : 'Sin zona');
+                $estLabel = [
+                    'recibido'        => 'RECIBIDO',
+                    'clasificado'     => 'CLASIFICADO',
+                    'en_espera'       => 'EN ESPERA',
+                    'despachado'      => 'DESPACHADO',
+                    'daniado'         => 'DAÑADO',
+                    'tiempo_excedido' => 'TIEMPO EXCEDIDO',
+                ][$est] ?? strtoupper(str_replace('_', ' ', $est));
             @endphp
             <tr>
                 <td style="font-size:12px; font-weight:bold; color:#e74c3c">{{ $id }}</td>
@@ -67,13 +75,14 @@
                 <td><strong>{{ $pes }} kg</strong></td>
                 <td>
                     <span style="background:#fef9f9; border:1px solid #e74c3c; color:#e74c3c;
-                                 padding:2px 8px; border-radius:10px; font-size:12px">
+                                 padding:2px 8px; border-radius:10px; font-size:12px;
+                                 white-space:nowrap">
                         {{ $zon }}
                     </span>
                 </td>
                 <td>
                     <span class="badge badge-{{ $est }}">
-                        {{ strtoupper(str_replace('_', ' ', $est)) }}
+                        {{ $estLabel }}
                     </span>
                 </td>
                 <td style="font-size:12px; color:#888">
