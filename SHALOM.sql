@@ -2,17 +2,16 @@
 -- PostgreSQL database dump
 --
 
-\restrict R4ijbXQdhX9sPheKUahhg1NSecD9lr7PuUPJ5jzqvF3hnlakeZ2OZSjZ42r7grv
+\restrict 2Q7SLEpVwEtuA65CTwl4ODuSYifBSYD1AUK9Cc6qP61Kuad5Iip72Ubrhv4doQ5
 
 -- Dumped from database version 15.18 (Debian 15.18-0+deb12u1)
--- Dumped by pg_dump version 18.3
+-- Dumped by pg_dump version 15.18 (Debian 15.18-0+deb12u1)
 
--- Started on 2026-06-24 10:01:37
+-- Started on 2026-06-24 19:00:04 -05
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -22,7 +21,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 260 (class 1255 OID 17973)
+-- TOC entry 259 (class 1255 OID 17973)
 -- Name: actualizar_arbol_almacen(); Type: PROCEDURE; Schema: public; Owner: fabrizio
 --
 
@@ -86,7 +85,7 @@ $$;
 ALTER PROCEDURE public.actualizar_arbol_almacen() OWNER TO fabrizio;
 
 --
--- TOC entry 263 (class 1255 OID 18191)
+-- TOC entry 262 (class 1255 OID 18191)
 -- Name: actualizar_bst_encomiendas(); Type: PROCEDURE; Schema: public; Owner: fabrizio
 --
 
@@ -248,7 +247,7 @@ $$;
 ALTER PROCEDURE public.cambiar_estado_encomienda(IN p_id_encomienda character varying, IN p_estado_nuevo character varying, IN p_observacion text, IN p_id_usuario bigint) OWNER TO fabrizio;
 
 --
--- TOC entry 257 (class 1255 OID 16754)
+-- TOC entry 256 (class 1255 OID 16754)
 -- Name: generar_alertas_tiempo(); Type: PROCEDURE; Schema: public; Owner: fabrizio
 --
 
@@ -297,7 +296,7 @@ $$;
 ALTER PROCEDURE public.generar_alertas_tiempo() OWNER TO fabrizio;
 
 --
--- TOC entry 255 (class 1255 OID 17078)
+-- TOC entry 254 (class 1255 OID 17078)
 -- Name: limpiar_encomiendas_despachadas(); Type: PROCEDURE; Schema: public; Owner: fabrizio
 --
 
@@ -333,7 +332,7 @@ $$;
 ALTER PROCEDURE public.limpiar_encomiendas_despachadas() OWNER TO fabrizio;
 
 --
--- TOC entry 258 (class 1255 OID 17959)
+-- TOC entry 257 (class 1255 OID 17959)
 -- Name: obtener_alertas_activas(); Type: FUNCTION; Schema: public; Owner: fabrizio
 --
 
@@ -370,7 +369,7 @@ $$;
 ALTER FUNCTION public.obtener_alertas_activas() OWNER TO fabrizio;
 
 --
--- TOC entry 259 (class 1255 OID 17960)
+-- TOC entry 258 (class 1255 OID 17960)
 -- Name: obtener_arbol_almacen(); Type: FUNCTION; Schema: public; Owner: fabrizio
 --
 
@@ -424,7 +423,7 @@ $$;
 ALTER FUNCTION public.obtener_arbol_almacen() OWNER TO fabrizio;
 
 --
--- TOC entry 256 (class 1255 OID 17120)
+-- TOC entry 255 (class 1255 OID 17120)
 -- Name: obtener_historial_encomienda(character varying); Type: FUNCTION; Schema: public; Owner: fabrizio
 --
 
@@ -521,7 +520,7 @@ $$;
 ALTER PROCEDURE public.registrar_encomienda(IN p_remitente character varying, IN p_destinatario character varying, IN p_ciudad_destino character varying, IN p_peso numeric, IN p_dimensiones character varying, IN p_descripcion text, IN p_id_usuario bigint) OWNER TO fabrizio;
 
 --
--- TOC entry 254 (class 1255 OID 17079)
+-- TOC entry 263 (class 1255 OID 17079)
 -- Name: reubicar_encomienda(character varying, text, bigint); Type: PROCEDURE; Schema: public; Owner: fabrizio
 --
 
@@ -544,10 +543,11 @@ BEGIN
         id_zona = zona_reubic,
         updated_at = NOW()
     WHERE id_encomienda = p_id_encomienda;
+    -- Usa el estado real de la encomienda en lugar de hardcodear 'tiempo_excedido'
     INSERT INTO historial_movimientos (
         id_encomienda, estado_anterior, estado_nuevo, observacion, id_usuario, created_at
     ) VALUES (
-        p_id_encomienda, 'tiempo_excedido', 'en_espera', 
+        p_id_encomienda, fila_enc.estado, 'en_espera',
         p_observacion, p_id_usuario, NOW()
     );
     CALL actualizar_estado_zona(fila_enc.id_zona);
@@ -566,7 +566,7 @@ $$;
 ALTER PROCEDURE public.reubicar_encomienda(IN p_id_encomienda character varying, IN p_observacion text, IN p_id_usuario bigint) OWNER TO fabrizio;
 
 --
--- TOC entry 261 (class 1255 OID 17974)
+-- TOC entry 260 (class 1255 OID 17974)
 -- Name: trigger_actualizar_arbol(); Type: FUNCTION; Schema: public; Owner: fabrizio
 --
 
@@ -583,7 +583,7 @@ $$;
 ALTER FUNCTION public.trigger_actualizar_arbol() OWNER TO fabrizio;
 
 --
--- TOC entry 262 (class 1255 OID 18192)
+-- TOC entry 261 (class 1255 OID 18192)
 -- Name: trigger_actualizar_bst(); Type: FUNCTION; Schema: public; Owner: fabrizio
 --
 
@@ -635,7 +635,7 @@ CREATE SEQUENCE public.alertas_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.alertas_id_seq OWNER TO fabrizio;
+ALTER TABLE public.alertas_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3532 (class 0 OID 0)
@@ -680,7 +680,7 @@ CREATE SEQUENCE public.arbol_almacen_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.arbol_almacen_id_seq OWNER TO fabrizio;
+ALTER TABLE public.arbol_almacen_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3533 (class 0 OID 0)
@@ -723,7 +723,7 @@ CREATE SEQUENCE public.bst_encomiendas_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.bst_encomiendas_id_seq OWNER TO fabrizio;
+ALTER TABLE public.bst_encomiendas_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3534 (class 0 OID 0)
@@ -796,7 +796,7 @@ CREATE SEQUENCE public.configuracion_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.configuracion_id_seq OWNER TO fabrizio;
+ALTER TABLE public.configuracion_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3535 (class 0 OID 0)
@@ -862,7 +862,7 @@ CREATE SEQUENCE public.failed_jobs_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.failed_jobs_id_seq OWNER TO fabrizio;
+ALTER TABLE public.failed_jobs_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3536 (class 0 OID 0)
@@ -905,7 +905,7 @@ CREATE SEQUENCE public.historial_movimientos_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.historial_movimientos_id_seq OWNER TO fabrizio;
+ALTER TABLE public.historial_movimientos_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3537 (class 0 OID 0)
@@ -968,7 +968,7 @@ CREATE SEQUENCE public.jobs_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.jobs_id_seq OWNER TO fabrizio;
+ALTER TABLE public.jobs_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3538 (class 0 OID 0)
@@ -1007,7 +1007,7 @@ CREATE SEQUENCE public.migrations_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.migrations_id_seq OWNER TO fabrizio;
+ALTER TABLE public.migrations_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3539 (class 0 OID 0)
@@ -1083,7 +1083,7 @@ CREATE SEQUENCE public.users_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.users_id_seq OWNER TO fabrizio;
+ALTER TABLE public.users_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3540 (class 0 OID 0)
@@ -1125,7 +1125,7 @@ CREATE SEQUENCE public.zonas_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.zonas_id_seq OWNER TO fabrizio;
+ALTER TABLE public.zonas_id_seq OWNER TO fabrizio;
 
 --
 -- TOC entry 3541 (class 0 OID 0)
@@ -1226,6 +1226,17 @@ COPY public.alertas (id, id_encomienda, tipo, estado, fecha_generada, created_at
 1	SHL-2026-06-000006	tiempo_excedido	resuelta	2026-06-22 09:23:21	2026-06-22 09:23:21	2026-06-22 14:24:30
 2	SHL-2026-06-000007	tiempo_excedido	resuelta	2026-06-22 09:23:21	2026-06-22 09:23:21	2026-06-22 14:50:21
 3	SHL-2026-06-000008	tiempo_excedido	resuelta	2026-06-22 09:23:21	2026-06-22 09:23:21	2026-06-22 15:44:40
+4	SHL-2026-06-000001	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+5	SHL-2026-06-000002	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+6	SHL-2026-06-000003	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+7	SHL-2026-06-000004	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+8	SHL-2026-06-000005	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+9	SHL-2026-06-000009	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+10	SHL-2026-06-000010	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+11	SHL-2026-06-000011	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+12	SHL-2026-06-000008	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+13	SHL-2026-06-000007	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
+14	SHL-2026-06-000006	tiempo_excedido	generada	2026-06-24 19:00:02	2026-06-24 19:00:02	2026-06-24 19:00:02
 \.
 
 
@@ -1236,22 +1247,22 @@ COPY public.alertas (id, id_encomienda, tipo, estado, fecha_generada, created_at
 --
 
 COPY public.arbol_almacen (id, nivel, tipo, id_nodo, nombre, estado, id_padre, created_at, updated_at) FROM stdin;
-417	0	almacen	0	Almacén Shalom	activo	\N	2026-06-22 11:17:55	2026-06-22 11:17:55
-418	1	zona	2	Zona B	disponible	417	2026-06-22 11:17:55	2026-06-22 11:17:55
-419	1	zona	3	Zona C	disponible	417	2026-06-22 11:17:55	2026-06-22 11:17:55
-420	2	encomienda	SHL-2026-06-000006	Roberto Quispe → Sandra Lima	en_espera	419	2026-06-22 11:17:55	2026-06-22 11:17:55
-421	1	zona	1	Zona A	parcialmente_ocupada	417	2026-06-22 11:17:55	2026-06-22 11:17:55
-422	2	encomienda	SHL-2026-06-000001	Juan Perez → Maria Garcia	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-423	2	encomienda	SHL-2026-06-000002	Carlos Lopez → Ana Torres	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-424	2	encomienda	SHL-2026-06-000003	Luis Mamani → Rosa Quispe	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-425	2	encomienda	SHL-2026-06-000004	Pedro Flores → Carmen Huanca	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-426	2	encomienda	SHL-2026-06-000005	Jose Condori → Elena Vargas	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-427	2	encomienda	SHL-2026-06-000009	Roberto Quispe → Sandra Lima	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-428	2	encomienda	SHL-2026-06-000010	Miguel Torres → Carmen Puno	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-429	2	encomienda	SHL-2026-06-000011	Diana Flores → Jorge Cusco	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-430	2	encomienda	SHL-2026-06-000012	fabrizio → fredy	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-431	2	encomienda	SHL-2026-06-000008	Diana Flores → Jorge Cusco	en_espera	421	2026-06-22 11:17:55	2026-06-22 11:17:55
-432	2	encomienda	SHL-2026-06-000007	Miguel Torres → Carmen Puno	clasificado	421	2026-06-22 11:17:55	2026-06-22 11:17:55
+609	0	almacen	0	Almacén Shalom	activo	\N	2026-06-24 19:00:02	2026-06-24 19:00:02
+610	1	zona	2	Zona B	disponible	609	2026-06-24 19:00:02	2026-06-24 19:00:02
+611	1	zona	3	Zona C	parcialmente_ocupada	609	2026-06-24 19:00:02	2026-06-24 19:00:02
+612	2	encomienda	SHL-2026-06-000006	Roberto Quispe → Sandra Lima	tiempo_excedido	611	2026-06-24 19:00:02	2026-06-24 19:00:02
+613	1	zona	4	Zona D	disponible	609	2026-06-24 19:00:02	2026-06-24 19:00:02
+614	1	zona	1	Zona A	parcialmente_ocupada	609	2026-06-24 19:00:02	2026-06-24 19:00:02
+615	2	encomienda	SHL-2026-06-000001	Juan Perez → Maria Garcia	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+616	2	encomienda	SHL-2026-06-000002	Carlos Lopez → Ana Torres	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+617	2	encomienda	SHL-2026-06-000003	Luis Mamani → Rosa Quispe	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+618	2	encomienda	SHL-2026-06-000004	Pedro Flores → Carmen Huanca	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+619	2	encomienda	SHL-2026-06-000005	Jose Condori → Elena Vargas	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+620	2	encomienda	SHL-2026-06-000009	Roberto Quispe → Sandra Lima	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+621	2	encomienda	SHL-2026-06-000010	Miguel Torres → Carmen Puno	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+622	2	encomienda	SHL-2026-06-000011	Diana Flores → Jorge Cusco	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+623	2	encomienda	SHL-2026-06-000008	Diana Flores → Jorge Cusco	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
+624	2	encomienda	SHL-2026-06-000007	Miguel Torres → Carmen Puno	tiempo_excedido	614	2026-06-24 19:00:02	2026-06-24 19:00:02
 \.
 
 
@@ -1262,18 +1273,17 @@ COPY public.arbol_almacen (id, nivel, tipo, id_nodo, nombre, estado, id_padre, c
 --
 
 COPY public.bst_encomiendas (id, nombre, id_encomienda, id_izquierdo, id_derecho, created_at, updated_at) FROM stdin;
-345	Juan Perez	SHL-2026-06-000001	\N	346	2026-06-22 11:17:55	2026-06-22 11:17:55
-346	Carlos Lopez	SHL-2026-06-000002	\N	347	2026-06-22 11:17:55	2026-06-22 11:17:55
-347	Luis Mamani	SHL-2026-06-000003	\N	348	2026-06-22 11:17:55	2026-06-22 11:17:55
-348	Pedro Flores	SHL-2026-06-000004	\N	349	2026-06-22 11:17:55	2026-06-22 11:17:55
-350	Roberto Quispe	SHL-2026-06-000006	\N	\N	2026-06-22 11:17:55	2026-06-22 11:17:55
-349	Jose Condori	SHL-2026-06-000005	\N	350	2026-06-22 11:17:55	2026-06-22 11:17:55
-344	Miguel Torres	SHL-2026-06-000007	345	351	2026-06-22 11:17:55	2026-06-22 11:17:55
-351	Diana Flores	SHL-2026-06-000008	\N	352	2026-06-22 11:17:55	2026-06-22 11:17:55
-352	Roberto Quispe	SHL-2026-06-000009	\N	353	2026-06-22 11:17:55	2026-06-22 11:17:55
-353	Miguel Torres	SHL-2026-06-000010	\N	354	2026-06-22 11:17:55	2026-06-22 11:17:55
-355	fabrizio	SHL-2026-06-000012	\N	\N	2026-06-22 11:17:55	2026-06-22 11:17:55
-354	Diana Flores	SHL-2026-06-000011	\N	355	2026-06-22 11:17:55	2026-06-22 11:17:55
+478	Juan Perez	SHL-2026-06-000001	\N	479	2026-06-24 19:00:02	2026-06-24 19:00:02
+479	Carlos Lopez	SHL-2026-06-000002	\N	480	2026-06-24 19:00:02	2026-06-24 19:00:02
+480	Luis Mamani	SHL-2026-06-000003	\N	481	2026-06-24 19:00:02	2026-06-24 19:00:02
+482	Jose Condori	SHL-2026-06-000005	\N	\N	2026-06-24 19:00:02	2026-06-24 19:00:02
+481	Pedro Flores	SHL-2026-06-000004	\N	482	2026-06-24 19:00:02	2026-06-24 19:00:02
+477	Roberto Quispe	SHL-2026-06-000006	478	483	2026-06-24 19:00:02	2026-06-24 19:00:02
+483	Miguel Torres	SHL-2026-06-000007	\N	484	2026-06-24 19:00:02	2026-06-24 19:00:02
+484	Diana Flores	SHL-2026-06-000008	\N	485	2026-06-24 19:00:02	2026-06-24 19:00:02
+485	Roberto Quispe	SHL-2026-06-000009	\N	486	2026-06-24 19:00:02	2026-06-24 19:00:02
+487	Diana Flores	SHL-2026-06-000011	\N	\N	2026-06-24 19:00:02	2026-06-24 19:00:02
+486	Miguel Torres	SHL-2026-06-000010	\N	487	2026-06-24 19:00:02	2026-06-24 19:00:02
 \.
 
 
@@ -1304,7 +1314,7 @@ COPY public.cache_locks (key, owner, expiration) FROM stdin;
 --
 
 COPY public.configuracion (id, tiempo_maximo_dias, id_zona_reubicacion, fecha_actualizacion, id_admin, created_at, updated_at, peso_maximo_pequeno, peso_maximo_mediano) FROM stdin;
-1	7	3	2026-06-22 16:17:39	1	2026-06-22 12:20:22	2026-06-22 16:17:39	5.00	20.00
+1	1	3	2026-06-24 16:17:14	1	2026-06-22 12:20:22	2026-06-24 16:17:14	5.00	20.00
 \.
 
 
@@ -1315,18 +1325,18 @@ COPY public.configuracion (id, tiempo_maximo_dias, id_zona_reubicacion, fecha_ac
 --
 
 COPY public.encomiendas (id_encomienda, remitente, destinatario, ciudad_destino, peso, dimensiones, descripcion, estado, id_zona, fecha_ingreso, created_at, updated_at, imagen) FROM stdin;
-SHL-2026-06-000001	Juan Perez	Maria Garcia	Lima	2.50	20x15x10	Ropa	clasificado	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-22 07:20:22	\N
-SHL-2026-06-000002	Carlos Lopez	Ana Torres	Cusco	8.00	30x25x20	Libros	clasificado	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-22 07:20:22	\N
-SHL-2026-06-000003	Luis Mamani	Rosa Quispe	Arequipa	25.00	50x40x30	Electrodomestico	clasificado	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-22 07:20:22	\N
-SHL-2026-06-000004	Pedro Flores	Carmen Huanca	Puno	1.20	15x10x8	Documentos	clasificado	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-22 07:20:22	\N
-SHL-2026-06-000005	Jose Condori	Elena Vargas	Tacna	15.00	40x30x25	Herramientas	clasificado	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-22 07:20:22	\N
-SHL-2026-06-000009	Roberto Quispe	Sandra Lima	Lima	3.00	20x15x10	Documentos	clasificado	1	2026-06-22 09:23:37	2026-06-22 09:23:37	2026-06-22 09:23:37	\N
-SHL-2026-06-000010	Miguel Torres	Carmen Puno	Puno	9.00	35x25x20	Ropa	clasificado	1	2026-06-22 09:23:37	2026-06-22 09:23:37	2026-06-22 09:23:37	\N
-SHL-2026-06-000011	Diana Flores	Jorge Cusco	Cusco	22.00	45x35x25	Electrodomestico	clasificado	1	2026-06-22 09:23:37	2026-06-22 09:23:37	2026-06-22 09:23:37	\N
-SHL-2026-06-000012	fabrizio	fredy	Abancay	15.00	30x30x30	libros	clasificado	1	2026-06-22 10:40:26	2026-06-22 10:40:26	2026-06-22 15:40:25	encomiendas/ca6aySvYsjfDVk9Zl0Y5uGgBOXUrlIVJBbJlVRnx.jpg
-SHL-2026-06-000008	Diana Flores	Jorge Cusco	Cusco	22.00	45x35x25	Electrodomestico	en_espera	1	2026-06-12 09:23:37	2026-06-22 09:23:21	2026-06-22 10:44:41	\N
-SHL-2026-06-000007	Miguel Torres	Carmen Puno	Puno	9.00	35x25x20	Ropa	clasificado	1	2026-06-12 09:23:37	2026-06-22 09:23:21	2026-06-22 10:45:14	\N
-SHL-2026-06-000006	Roberto Quispe	Sandra Lima	Lima	3.00	20x15x10	Documentos	en_espera	3	2026-06-12 09:23:37	2026-06-22 09:23:21	2026-06-22 11:17:55	\N
+SHL-2026-06-000012	fabrizio	fredy	Abancay	15.00	30x30x30	libros	despachado	1	2026-06-22 10:40:26	2026-06-22 10:40:26	2026-06-24 11:01:18	encomiendas/ca6aySvYsjfDVk9Zl0Y5uGgBOXUrlIVJBbJlVRnx.jpg
+SHL-2026-06-000001	Juan Perez	Maria Garcia	Lima	2.50	20x15x10	Ropa	tiempo_excedido	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-24 19:00:02	\N
+SHL-2026-06-000002	Carlos Lopez	Ana Torres	Cusco	8.00	30x25x20	Libros	tiempo_excedido	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-24 19:00:02	\N
+SHL-2026-06-000003	Luis Mamani	Rosa Quispe	Arequipa	25.00	50x40x30	Electrodomestico	tiempo_excedido	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-24 19:00:02	\N
+SHL-2026-06-000004	Pedro Flores	Carmen Huanca	Puno	1.20	15x10x8	Documentos	tiempo_excedido	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-24 19:00:02	\N
+SHL-2026-06-000005	Jose Condori	Elena Vargas	Tacna	15.00	40x30x25	Herramientas	tiempo_excedido	1	2026-06-22 07:20:22	2026-06-22 07:20:22	2026-06-24 19:00:02	\N
+SHL-2026-06-000009	Roberto Quispe	Sandra Lima	Lima	3.00	20x15x10	Documentos	tiempo_excedido	1	2026-06-22 09:23:37	2026-06-22 09:23:37	2026-06-24 19:00:02	\N
+SHL-2026-06-000010	Miguel Torres	Carmen Puno	Puno	9.00	35x25x20	Ropa	tiempo_excedido	1	2026-06-22 09:23:37	2026-06-22 09:23:37	2026-06-24 19:00:02	\N
+SHL-2026-06-000011	Diana Flores	Jorge Cusco	Cusco	22.00	45x35x25	Electrodomestico	tiempo_excedido	1	2026-06-22 09:23:37	2026-06-22 09:23:37	2026-06-24 19:00:02	\N
+SHL-2026-06-000008	Diana Flores	Jorge Cusco	Cusco	22.00	45x35x25	Electrodomestico	tiempo_excedido	1	2026-06-12 09:23:37	2026-06-22 09:23:21	2026-06-24 19:00:02	\N
+SHL-2026-06-000007	Miguel Torres	Carmen Puno	Puno	9.00	35x25x20	Ropa	tiempo_excedido	1	2026-06-12 09:23:37	2026-06-22 09:23:21	2026-06-24 19:00:02	\N
+SHL-2026-06-000006	Roberto Quispe	Sandra Lima	Lima	3.00	20x15x10	Documentos	tiempo_excedido	3	2026-06-12 09:23:37	2026-06-22 09:23:21	2026-06-24 19:00:02	\N
 \.
 
 
@@ -1364,6 +1374,7 @@ COPY public.historial_movimientos (id, id_encomienda, estado_anterior, estado_nu
 21	SHL-2026-06-000008	tiempo_excedido	en_espera	Alerta resuelta: hola	3	2026-06-22 10:44:41
 22	SHL-2026-06-000007	en_espera	clasificado	\N	2	2026-06-22 10:45:14
 23	SHL-2026-06-000006	tiempo_excedido	en_espera	Reubicación física completada	2	2026-06-22 11:17:55
+24	SHL-2026-06-000012	clasificado	despachado	Encomienda despachada	2	2026-06-24 11:01:18
 \.
 
 
@@ -1429,33 +1440,13 @@ COPY public.password_reset_tokens (email, token, created_at) FROM stdin;
 --
 
 COPY public.sessions (id, user_id, ip_address, user_agent, payload, last_activity) FROM stdin;
-2LWa5uHSWkQoSu8W3gLL6VrEDl7OJmqlyhdl9wpS	\N	190.239.90.129	WhatsApp/2.2622.101 W	YTozOntzOjY6Il90b2tlbiI7czo0MDoib2NPVDU1ZlBwVDlaallmeUllTExoRmNuZDR0SlNsT1dqVHhYRXRVaSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309817
-mQLmUeWkOlSSbsBgXxNuwsGkWkqIjEcQDWYYfw4T	\N	64.62.156.162	Mozilla/5.0 (Windows NT 10.0.0; Win64; x64; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.63 Chrome/124.0.6367.63 Not-A.Brand/99  Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiUlpFUGtrWVE0a0wycXVaeTI4bkpVajZqZnBvVzlZeGRqQkVLNnhuWSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjI6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782304991
-vBBcXReX6YzKRb7seGNqrGPyoNh3wQB4O3O9PLyW	\N	34.176.208.218	Go-http-client/1.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoiaWJva0Vhcm05T2RaS1JZNFAxcW93cGJaOExFQjFkUnJlZ1l0MWZSbiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjI6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782309020
-h66hboW3dze33kjYZdQ9ssXNbAuwAJBXSD3uL7ok	\N	190.239.90.129	WhatsApp/2.2622.101 W	YTozOntzOjY6Il90b2tlbiI7czo0MDoiWndVSlEyY1Q0blNqdElNNHp1R1dUdEpuQkxyQVFKR0xoNzBIMm4yeCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309847
-7aOiWN04TB7qo1l5fN7z899lYcp0jeLwcHtCspyo	\N	64.62.156.165	Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0	YTozOntzOjY6Il90b2tlbiI7czo0MDoiRllXMlQ2WFNPRTliOFFsMkNicnRzSVg0MUdOVUxkM0VHU1hFYmZ2aCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjI6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782305040
-1byZmViBajgtftBsLCONOMtvlF4AfbHwlq1GkrlK	\N	34.176.208.218	Go-http-client/1.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoiMWJuN0lRcWpObms5TEkxWE9MZm5mUmF2aTU0aWxXakRERFN1OHIxSSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjg6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309020
-4LQpv5Oaei8szl5t109Y5JJL5EMxGYUzrrutdMaX	\N	190.239.90.129	WhatsApp/2.2622.101 W	YTozOntzOjY6Il90b2tlbiI7czo0MDoiQlBNY0dpc2g5RVVoMmRobE91U3Jhc0JDOU1MWjNBbjVQSThQc0phViI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309876
-t80z44huEYSaPbiuwopqLFvUi5dlNY90fiPFqFOR	\N	64.62.156.165	Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0	YTozOntzOjY6Il90b2tlbiI7czo0MDoiV0NaVVg1d2lYZG1EQUlneW9Va0EwRmxlYUEzTGgzR1RJT1B0TDNIZyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjg6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782305040
-YYcxYwnB2SnxEdjD7DmS2Zbm2O1nqYY26jyXuL7W	\N	179.6.145.133	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiVUl3ak9sMnU5Y2hTU09wWml0RXd3MWxFcllMckx0MUVYd283SnI0RSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309163
-ql54SCsBJ555RvwL9VCXoXP7lyfCUh7GhrTPB65A	\N	45.153.34.43	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiNW1MNFRSMVNJTjZQMUlYdmlpR29LMkxuUld5OE1yNDk5QVZycG9RcyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMSI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==	1782310144
-OAsvoqYdTozMi6e45vAy9psH9zbOUmqRCclMbKmA	\N	34.76.58.207	python-requests/2.32.5	YTozOntzOjY6Il90b2tlbiI7czo0MDoiSUl5TkRCSm5lV3FhOHFpNGVubnZrQjFEVU1kM2ZmZElhTmpaVzBNMyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMSI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==	1782305147
-WBlW1XuBXeXCvBkMuBKTuqJrTXoWlWiWnDlwEFxq	\N	104.244.78.33	Mozilla/5.0 (compatible; Applebot/0.1; +http://www.apple.com/go/applebot)	YTozOntzOjY6Il90b2tlbiI7czo0MDoiSFd4SGNRRzQ4UG5PQkRBaE1LbFpHZk9ieGZVdGZ0WWxOWlh5N2tKUyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjI6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782311623
-LliAccUQPGoKPgtrvg1U1WcFuUU0kHdLKnsb2plY	\N	45.148.10.200	l9tcpid/v1.1.0	YTozOntzOjY6Il90b2tlbiI7czo0MDoiZ2YyZDY5YUdEUWRCU2tYajgwTkZPMHhiSFJIR1dSYWI1QWhmMGxyViI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjI6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782306440
-tvIZkegXxz9HQ9ez0D6bAQk1bxeuNmonH4MhoDe6	\N	177.91.255.69	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiNm84dGg0bXY5RVJpZktNVW43eExnYzN2cmhza3hKSG1IMktZVDZzOSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309590
-qZVv2mbgm3C0G8xthQvIPA0HCy9kNeRBhT57Pyu4	\N	104.244.78.33	Mozilla/5.0 (compatible; Applebot/0.1; +http://www.apple.com/go/applebot)	YTozOntzOjY6Il90b2tlbiI7czo0MDoibUdqOHRscU5SbUs1QUJiUTNvUjJkMnd0MDBkZWtkV1NWNmtJd05xTiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjg6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782311623
-MQ1XCk0B10XtInFfrBD0TZnm3ut7zXThxkeHoHNQ	\N	153.75.91.100	l9tcpid/v1.1.0	YTozOntzOjY6Il90b2tlbiI7czo0MDoiMDRRYlp1SXRXd2VmRlplSGM5cHJ2R3N2Yzhsb0pNNzhFdnYxT1hiZyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMSI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==	1782306624
-xYcb056Fn5LwpNrYKDIRGcki2FgLJKKamfpR6HxY	1	190.239.90.129	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36	YTo0OntzOjY6Il90b2tlbiI7czo0MDoiUTFYamQ3SDhUYjJTWUFlSHJWcjBpM01EVVVyRnZmVm82YnFrWm1VcCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvZW5jb21pZW5kYXMiO3M6NToicm91dGUiO3M6MTc6ImVuY29taWVuZGFzLmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9	1782309704
-0uNaS3ne93TxG2kix6aHY4mpm6FFjOAiuAV1NLDG	\N	104.244.78.33	Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GPTBot/1.3; +https://openai.com/gptbot)	YTozOntzOjY6Il90b2tlbiI7czo0MDoicFU0NGJGdlpXb2xvRUhyaGdHOWp6VVVnekhYRGtnN05Ud0E1cVRCaCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzE6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEvdHJhY2tpbmciO3M6NToicm91dGUiO3M6ODoidHJhY2tpbmciO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782311662
-uxzn6FaecxraLDO9nu5Mna7VqI7YRpNtsdrniLef	\N	49.51.253.83	Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoiRXRoZDl1b3lUU09uQjZIU09LbGJWU2RFbzVuUElFc3M2dXFWa0I4NyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMSI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==	1782307595
-8sgILFw12LvlA6PF9f8yKStw8HxdACgsE7u8Fq9n	\N	177.91.255.68	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiMU1nSzdXclhHcm5MWlNIaWx6MWNEVFFyWHlJN3F0S0JNbVBjTEp4YyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309639
-Vyg7HPbDnaIo03Fc5sYB7VcLtUOrUCwis6H0Fl21	\N	104.244.78.33	Mozilla/5.0 (compatible; Google-CloudVertexBot; +https://cloud.google.com/vertex-ai-bot)	YTozOntzOjY6Il90b2tlbiI7czo0MDoiaXlNVmVrQ2ZZQzBONmgwQkF4VlJycWVHVVh4NlhsRWxLcWkzclBWciI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjg6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782311695
-dMCWN2A42eHqOweyiXC75N6S1YXvTTzNI0mXtqTo	\N	49.51.253.83	Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoiaVVaaG93MkN0SjZXN1ZjMUpYc2dFWGNtbVJRelJDRlc2d3NIQVI1bSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMS9sb2dpbiI7czo1OiJyb3V0ZSI7czo1OiJsb2dpbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782307595
-k1tr9aB2WgJDyeMtL0VbPVM3LAWuUMmf9z9NWEwE	\N	177.91.255.68	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiVTBwTnZkdGJDZnI3NWFacFFnWGNxZmxNbTRETXl0VGlzWVRMWXlzViI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309642
-L2bnjQLD7hjoDuR9pMzVUtbKBJtOngGMmFimJKf5	\N	34.176.208.218	Go-http-client/1.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoiejhBbE5JZzZOeFVHcXptWWRDM1pvT1QyVldtREoyVzhibUJRMmxRdCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMSI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==	1782309020
-SqlR4i068gX4mJycfmLY7YWQbw3HIx3k4KE8aLYr	\N	190.216.191.100	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiMDhDTnI5Vm5wY3hpbkg1Z0xEUXk5dW9BZ0FycG9UWXFISFB3dFVyQiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzQ6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782309647
-mmKgE5T16D1JqVGev6eKGpb2StsWCfAiGBU91CR0	\N	64.62.156.162	Mozilla/5.0 (Windows NT 10.0.0; Win64; x64; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.63 Chrome/124.0.6367.63 Not-A.Brand/99  Safari/537.36	YTozOntzOjY6Il90b2tlbiI7czo0MDoiSlo4SURHdVlDNk5KeDJEZ2xncXBBbzZveHRoUFdHTHF6RnpvSDJLRiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjI6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782304472
-ylNlBOYz9JUopJGrRSBOZlULj963agYLMjZjbnuj	\N	34.176.208.218	Go-http-client/1.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoiaTUybjVZaldZNlAzRnhWc2xadkt4bnAwQ3Awb0FqYUZTaFBGUzdIVSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMS9sb2dpbiI7czo1OiJyb3V0ZSI7czo1OiJsb2dpbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782309020
+VXbBpr3Uu0Qmtn0i5rEOtZD6NT8Yo0wvIaGekaub	1	201.240.180.184	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36	YTo0OntzOjY6Il90b2tlbiI7czo0MDoid0ZmeFF4dVZXZWhJUHRaRzhINFNkUmJzSXRsV2hxeVZSNDFpZkhPOSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDA6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUvZW5jb21pZW5kYXMiO3M6NToicm91dGUiO3M6MTc6ImVuY29taWVuZGFzLmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9	1782344890
+jZbZlHcQO3ghaDz564i15G4d23Jfdm9um9LQjf6E	\N	135.237.125.223	Mozilla/5.0 zgrab/0.x	YTozOntzOjY6Il90b2tlbiI7czo0MDoiTnNYOUtNYTVZTUN6TWZpdGVNRmtaUTB2Zm1MdXBybkRBazJzQVpTSyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjg6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEvbG9naW4iO3M6NToicm91dGUiO3M6NToibG9naW4iO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19	1782337056
+V5MbVxIOiKGk9ClNbhsFoDWqAZuH6Sw7cuu7KHpJ	\N	159.65.168.103	Mozilla/5.0 zgrab/0.x	YTozOntzOjY6Il90b2tlbiI7czo0MDoib3NONjZsUEF0djgwRm5hQW5QbHQzWUFINnNZODBWczNCYjdHNEZ1ayI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMSI7czo1OiJyb3V0ZSI7Tjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==	1782339051
+Z9FCtpAVvyr48XdeXG4t7h23DFtlCpKHUpZynHTx	\N	113.31.186.195	Mozilla/5.0 (Linux; Android 5.1.1; vivo X7 Build/LMY47V; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.132 MQQBrowser/6.2 TBS/044204 Mobile Safari/537.36 MicroMessenger/6.6.7.1321(0x26060739) NetType/WIFI Language/zh_CN	YTozOntzOjY6Il90b2tlbiI7czo0MDoiOVg4VnExMHV5bDhNbXFYTnMwT1l0aU1ZamlueWJpYW1JQTJGVWNZTSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjg6Imh0dHBzOi8vc2hhbG9tLnRlY3N1cDIwLnNpdGUiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782342018
+BILrYR6g2vToprsPFtnueZKTpSbbQvXWpFr8Mx6p	\N	43.165.198.144	Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoicldHM1p6TXlIMHJsV2hSRFNzTXZQMHlYM01CZHpTMDhNYjV1bUQxNiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMS9sb2dpbiI7czo1OiJyb3V0ZSI7czo1OiJsb2dpbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782342674
+G80KvYDwB2PBJ43R2mZbh8KLJGA25MT9MRNaNlIF	\N	43.166.250.187	Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1	YTozOntzOjY6Il90b2tlbiI7czo0MDoiQ3EyRHZqY3JYdGVlREVKNXlaT0N0NmxCSkx5bFBQdjJTclc2UGJJQSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xNjEuMTMyLjY4LjEwMS9sb2dpbiI7czo1OiJyb3V0ZSI7czo1OiJsb2dpbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782336893
+gSeZY9iOzrMOcXz0tVWB31ecu5ri2RfzS8YckLv5	\N	135.237.125.223	Mozilla/5.0 zgrab/0.x	YTozOntzOjY6Il90b2tlbiI7czo0MDoidDYzdEZuaGhnb3dUOUhYUFQ0aXNYdlM0SmU2VXpXNU9RcXVIUXZzMCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MjI6Imh0dHBzOi8vMTYxLjEzMi42OC4xMDEiO3M6NToicm91dGUiO047fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=	1782337056
 \.
 
 
@@ -1469,6 +1460,7 @@ COPY public.users (id, name, email, email_verified_at, password, remember_token,
 1	Administrador	admin@shalom.com	\N	$2y$12$Kma0KPzzL1Qnkmjk7IP7Fuz/WhePF7cwngX0tJ8PRQwo2elQw4UPy	\N	2026-06-22 12:20:21	2026-06-22 12:20:21	administrador	activo
 2	Operario	operario@shalom.com	\N	$2y$12$qUhuG6kRlaIDrUFQm2YhyeiblLpPv0EPjc/I/h1e1v/vDtz.ithBy	\N	2026-06-22 12:20:21	2026-06-22 12:20:21	operario	activo
 3	Supervisor	supervisor@shalom.com	\N	$2y$12$u40DAGQ6q70jkcIZR6TlW.1aXc08jRY5LU7dpGOWq09ae.lqbsArW	\N	2026-06-22 12:20:21	2026-06-22 12:20:21	supervisor	activo
+4	fabrizio	fabrizio@shalom.com	\N	$2y$12$JjO0cJwx9yG/E7VQQ1cWkOlD3qkfsA0AbaJAD0SlWIbvvr3Rmsj4e	\N	2026-06-24 16:02:33	2026-06-24 23:47:32	administrador	activo
 \.
 
 
@@ -1480,8 +1472,9 @@ COPY public.users (id, name, email, email_verified_at, password, remember_token,
 
 COPY public.zonas (id, nombre, capacidad, estado, created_at, updated_at) FROM stdin;
 2	Zona B	15	disponible	2026-06-22 12:20:22	2026-06-22 12:20:22
-1	Zona A	20	parcialmente_ocupada	2026-06-22 12:20:22	2026-06-22 12:20:22
 3	Zona C	10	parcialmente_ocupada	2026-06-22 12:20:22	2026-06-22 12:20:22
+4	Zona D	20	disponible	2026-06-24 15:57:59	2026-06-24 15:57:59
+1	Zona A	20	parcialmente_ocupada	2026-06-22 12:20:22	2026-06-22 12:20:22
 \.
 
 
@@ -1491,7 +1484,7 @@ COPY public.zonas (id, nombre, capacidad, estado, created_at, updated_at) FROM s
 -- Name: alertas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fabrizio
 --
 
-SELECT pg_catalog.setval('public.alertas_id_seq', 3, true);
+SELECT pg_catalog.setval('public.alertas_id_seq', 14, true);
 
 
 --
@@ -1500,7 +1493,7 @@ SELECT pg_catalog.setval('public.alertas_id_seq', 3, true);
 -- Name: arbol_almacen_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fabrizio
 --
 
-SELECT pg_catalog.setval('public.arbol_almacen_id_seq', 432, true);
+SELECT pg_catalog.setval('public.arbol_almacen_id_seq', 624, true);
 
 
 --
@@ -1509,7 +1502,7 @@ SELECT pg_catalog.setval('public.arbol_almacen_id_seq', 432, true);
 -- Name: bst_encomiendas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fabrizio
 --
 
-SELECT pg_catalog.setval('public.bst_encomiendas_id_seq', 355, true);
+SELECT pg_catalog.setval('public.bst_encomiendas_id_seq', 487, true);
 
 
 --
@@ -1536,7 +1529,7 @@ SELECT pg_catalog.setval('public.failed_jobs_id_seq', 1, false);
 -- Name: historial_movimientos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fabrizio
 --
 
-SELECT pg_catalog.setval('public.historial_movimientos_id_seq', 23, true);
+SELECT pg_catalog.setval('public.historial_movimientos_id_seq', 24, true);
 
 
 --
@@ -1563,7 +1556,7 @@ SELECT pg_catalog.setval('public.migrations_id_seq', 15, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fabrizio
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 3, true);
+SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --
@@ -1572,7 +1565,7 @@ SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 -- Name: zonas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fabrizio
 --
 
-SELECT pg_catalog.setval('public.zonas_id_seq', 3, true);
+SELECT pg_catalog.setval('public.zonas_id_seq', 4, true);
 
 
 --
@@ -1883,11 +1876,11 @@ ALTER TABLE ONLY public.historial_movimientos
     ADD CONSTRAINT historial_movimientos_id_usuario_foreign FOREIGN KEY (id_usuario) REFERENCES public.users(id);
 
 
--- Completed on 2026-06-24 10:01:40
+-- Completed on 2026-06-24 19:00:08 -05
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict R4ijbXQdhX9sPheKUahhg1NSecD9lr7PuUPJ5jzqvF3hnlakeZ2OZSjZ42r7grv
+\unrestrict 2Q7SLEpVwEtuA65CTwl4ODuSYifBSYD1AUK9Cc6qP61Kuad5Iip72Ubrhv4doQ5
 
