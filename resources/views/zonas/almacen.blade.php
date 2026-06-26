@@ -6,85 +6,145 @@
 <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; flex-wrap:wrap; gap:10px">
         <div>
-            <h2 style="color:#2c3e50; margin-bottom:4px">🏭 Vista 2D del Almacén</h2>
-            <p style="color:#888; font-size:13px">Los paquetes se distribuyen automáticamente por peso en cada estante</p>
+            <h2 style="color:var(--dark); margin-bottom:4px; font-size:22px; font-weight:800">
+                <i class="fas fa-industry" style="color:var(--primary)"></i> Vista 2D del Almacén
+            </h2>
+            <p style="color:var(--muted); font-size:13px">
+                Los paquetes se distribuyen automáticamente por peso en cada estante
+            </p>
         </div>
-        <div style="background:#fef9f9; border:1px solid #fad5d5; border-radius:8px; padding:8px 15px; font-size:13px">
-            📊 Total nodos árbol: <strong style="color:#e74c3c">{{ $totalNodos }}</strong>
+        <div style="background:var(--primary-light); border:1px solid rgba(232,39,42,0.2);
+                    border-radius:10px; padding:10px 18px; font-size:13px; display:flex;
+                    align-items:center; gap:8px">
+            <i class="fas fa-sitemap" style="color:var(--primary)"></i>
+            <span style="color:var(--muted)">Total nodos árbol:</span>
+            <strong style="color:var(--primary); font-size:16px">{{ $totalNodos }}</strong>
         </div>
     </div>
 
-    <hr style="border:none; border-top:1px solid #ecf0f1; margin:15px 0 20px">
+    <hr style="border:none; border-top:1px solid var(--border); margin:15px 0 20px">
 
-    <div style="display:flex; gap:15px; flex-wrap:wrap">
+    <div style="display:flex; gap:16px; flex-wrap:wrap">
         @foreach($arbol['hijos'] as $zona)
-        <div style="flex:1; min-width:260px; border:2px solid #e74c3c; border-radius:10px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08)">
+        <div style="flex:1; min-width:270px;
+                    border:1.5px solid var(--border);
+                    border-radius:14px;
+                    overflow:hidden;
+                    box-shadow:var(--shadow);
+                    transition: transform 0.2s, box-shadow 0.2s"
+             onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'"
+             onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='var(--shadow)'">
 
             {{-- Cabecera de zona --}}
-            <div style="background:linear-gradient(135deg, #c0392b, #e74c3c); color:white; padding:10px 15px; display:flex; justify-content:space-between; align-items:center">
-                <strong style="font-size:15px">{{ $zona['nombre'] }}</strong>
-                <span style="padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold;
-                    background:{{ $zona['estado'] === 'disponible' ? '#27ae60' : 
-                      ($zona['estado'] === 'parcialmente_ocupada' ? '#f39c12' : 
-                      ($zona['estado'] === 'llena' ? '#c0392b' : '#7f8c8d')) }};
-                    color:white">
+            <div style="background:linear-gradient(135deg, var(--primary-dark), var(--primary));
+                        color:white; padding:12px 16px;
+                        display:flex; justify-content:space-between; align-items:center">
+                <div style="display:flex; align-items:center; gap:8px">
+                    <i class="fas fa-warehouse" style="font-size:14px; opacity:0.8"></i>
+                    <strong style="font-size:15px; font-weight:700">{{ $zona['nombre'] }}</strong>
+                </div>
+                @php
+                    $estadoColors = [
+                        'disponible'          => '#10B981',
+                        'parcialmente_ocupada'=> '#F59E0B',
+                        'llena'               => '#EF4444',
+                        'eliminada'           => '#6B7280',
+                    ];
+                    $estadoColor = $estadoColors[$zona['estado']] ?? '#6B7280';
+                @endphp
+                <span style="padding:4px 10px; border-radius:20px; font-size:10px; font-weight:700;
+                             background:rgba(255,255,255,0.2); color:white;
+                             border:1px solid rgba(255,255,255,0.3); white-space:nowrap">
                     {{ strtoupper(str_replace('_', ' ', $zona['estado'])) }}
                 </span>
             </div>
 
             {{-- 3 estantes --}}
             @foreach($zona['hijos'] as $estante)
-            <div style="border-bottom:1px solid #fad5d5; padding:10px; min-height:75px;
-                background:{{ $loop->last ? '#fff8f0' : ($loop->first ? '#f0f8ff' : '#fafafa') }}">
+            @php
+                $estanteBg = $loop->first ? '#F0F8FF' : ($loop->last ? '#FFF8F0' : '#FAFAFA');
+                $estanteColor = $loop->first ? '#2980b9' : ($loop->last ? '#e67e22' : '#64748B');
+                $estanteIcon = $loop->first ? 'fa-arrow-up' : ($loop->last ? 'fa-arrow-down' : 'fa-minus');
+            @endphp
+            <div style="border-bottom:1px solid var(--border); padding:12px;
+                        min-height:80px; background:{{ $estanteBg }}">
 
                 {{-- Etiqueta del estante --}}
-                <div style="font-size:11px; font-weight:bold; margin-bottom:8px;
-                    color:{{ $loop->last ? '#e67e22' : ($loop->first ? '#2980b9' : '#666') }}">
+                <div style="font-size:11px; font-weight:700; margin-bottom:10px;
+                            color:{{ $estanteColor }}; display:flex; align-items:center; gap:5px">
+                    <i class="fas {{ $estanteIcon }}" style="font-size:9px"></i>
                     {{ $estante['nombre'] }}
                 </div>
 
                 {{-- Paquetes --}}
-                <div style="display:flex; flex-wrap:wrap; gap:5px">
+                <div style="display:flex; flex-wrap:wrap; gap:6px">
                     @forelse($estante['paquetes'] as $paquete)
                     @php
                         $dims = explode('x', strtolower(str_replace(' ', '', $paquete['dimensiones'] ?? '10x10x10')));
-                        $w = isset($dims[0]) ? max(35, min(80, (int)$dims[0] * 2)) : 40;
-                        $h = isset($dims[1]) ? max(30, min(60, (int)$dims[1] * 2)) : 35;
-                        $bgColor = $paquete['estado'] === 'tiempo_excedido' ? '#8e44ad' :
-                                  ($paquete['estado'] === 'daniado' ? '#e74c3c' : '#2980b9');
+                        $w = isset($dims[0]) ? max(38, min(80, (int)$dims[0] * 2)) : 42;
+                        $h = isset($dims[1]) ? max(32, min(60, (int)$dims[1] * 2)) : 36;
+                        $bgColor = $paquete['estado'] === 'tiempo_excedido' ? '#7C3AED' :
+                                  ($paquete['estado'] === 'daniado' ? '#DC2626' : '#2563EB');
+                        $borderColor = $paquete['estado'] === 'tiempo_excedido' ? '#6D28D9' :
+                                      ($paquete['estado'] === 'daniado' ? '#B91C1C' : '#1D4ED8');
                     @endphp
                     <div style="position:relative; display:inline-block">
                         <a href="{{ route('encomiendas.ver', $paquete['id_encomienda']) }}"
                            style="display:flex; align-items:center; justify-content:center;
                                   width:{{ $w }}px; height:{{ $h }}px;
                                   background:{{ $bgColor }};
-                                  color:white; border-radius:6px; font-size:9px; font-weight:bold;
+                                  color:white; border-radius:8px; font-size:9px; font-weight:800;
                                   text-decoration:none; text-align:center; padding:2px;
-                                  border:2px solid rgba(255,255,255,0.3);
+                                  border:2px solid {{ $borderColor }};
                                   overflow:hidden; position:relative;
-                                  box-shadow:0 2px 4px rgba(0,0,0,0.2)"
-                           title="{{ $paquete['id_encomienda'] }} | {{ $paquete['remitente'] }} | {{ $paquete['peso'] }}kg">
+                                  box-shadow:0 2px 6px rgba(0,0,0,0.25);
+                                  transition: transform 0.15s, box-shadow 0.15s"
+                           onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.3)'"
+                           onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 2px 6px rgba(0,0,0,0.25)'"
+                           title="{{ $paquete['id_encomienda'] }}">
                             @if(!empty($paquete['imagen']))
                                 <img src="{{ asset('storage/' . $paquete['imagen']) }}"
-                                     style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0.5">
+                                     style="position:absolute; top:0; left:0; width:100%; height:100%;
+                                            object-fit:cover; opacity:0.4">
                             @endif
-                            <span style="position:relative; z-index:1">{{ substr($paquete['id_encomienda'], -3) }}</span>
+                            <span style="position:relative; z-index:1; letter-spacing:0.5px">
+                                {{ substr($paquete['id_encomienda'], -3) }}
+                            </span>
                         </a>
-                        <div style="display:none; position:absolute; bottom:110%; left:50%; transform:translateX(-50%);
-                                    background:white; border:1px solid #e74c3c; border-radius:8px; padding:10px;
-                                    min-width:160px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:100"
+
+                        {{-- Tooltip --}}
+                        <div style="display:none; position:absolute; bottom:110%; left:50%;
+                                    transform:translateX(-50%);
+                                    background:white; border:1px solid var(--border);
+                                    border-radius:10px; padding:12px;
+                                    min-width:170px; box-shadow:var(--shadow-lg); z-index:100"
                              class="tooltip-enc">
                             @if(!empty($paquete['imagen']))
                                 <img src="{{ asset('storage/' . $paquete['imagen']) }}"
-                                     style="width:100%; border-radius:4px; margin-bottom:8px">
+                                     style="width:100%; border-radius:6px; margin-bottom:8px;
+                                            object-fit:cover; height:80px">
                             @endif
-                            <p style="font-size:11px; margin:0; color:#e74c3c; font-weight:bold">{{ $paquete['id_encomienda'] }}</p>
-                            <p style="font-size:11px; margin:2px 0; color:#555">{{ $paquete['remitente'] }} → {{ $paquete['destinatario'] }}</p>
-                            <p style="font-size:11px; margin:0; color:#888">⚖️ {{ $paquete['peso'] }}kg</p>
+                            <p style="font-size:11px; margin:0 0 4px; color:var(--primary);
+                                      font-weight:700">{{ $paquete['id_encomienda'] }}</p>
+                            <p style="font-size:11px; margin:0 0 3px; color:var(--text)">
+                                <i class="fas fa-user" style="color:var(--muted); width:12px"></i>
+                                {{ $paquete['remitente'] }}
+                            </p>
+                            <p style="font-size:11px; margin:0 0 3px; color:var(--text)">
+                                <i class="fas fa-arrow-right" style="color:var(--muted); width:12px"></i>
+                                {{ $paquete['destinatario'] }}
+                            </p>
+                            <p style="font-size:11px; margin:0; color:var(--muted)">
+                                <i class="fas fa-weight-hanging" style="width:12px"></i>
+                                {{ $paquete['peso'] }} kg
+                            </p>
                         </div>
                     </div>
                     @empty
-                    <span style="color:#bbb; font-size:11px; font-style:italic">vacío</span>
+                    <span style="color:#CBD5E1; font-size:11px; font-style:italic;
+                                 display:flex; align-items:center; gap:4px">
+                        <i class="fas fa-inbox" style="font-size:10px"></i> vacío
+                    </span>
                     @endforelse
                 </div>
             </div>
@@ -95,19 +155,35 @@
     </div>
 
     {{-- Leyenda --}}
-    <div style="margin-top:20px; padding:12px 15px; background:#f8f9fa; border-radius:8px; display:flex; gap:20px; flex-wrap:wrap; align-items:center">
-        <span style="font-size:13px; font-weight:bold; color:#555">Leyenda:</span>
-        <span style="font-size:13px"><span style="background:#2980b9; color:white; padding:3px 10px; border-radius:10px; font-size:11px">■</span> Normal</span>
-        <span style="font-size:13px"><span style="background:#8e44ad; color:white; padding:3px 10px; border-radius:10px; font-size:11px">■</span> Tiempo Excedido</span>
-        <span style="font-size:13px"><span style="background:#e74c3c; color:white; padding:3px 10px; border-radius:10px; font-size:11px">■</span> Dañado</span>
-        <span style="color:#888; font-size:12px">💡 Pasa el mouse para ver detalles • Click para abrir</span>
+    <div style="margin-top:20px; padding:14px 18px; background:var(--surface);
+                border-radius:10px; border:1px solid var(--border);
+                display:flex; gap:20px; flex-wrap:wrap; align-items:center">
+        <span style="font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase;
+                     letter-spacing:0.5px">Leyenda</span>
+        <span style="display:flex; align-items:center; gap:6px; font-size:13px">
+            <span style="background:#2563EB; width:12px; height:12px; border-radius:3px; display:inline-block"></span>
+            Normal
+        </span>
+        <span style="display:flex; align-items:center; gap:6px; font-size:13px">
+            <span style="background:#7C3AED; width:12px; height:12px; border-radius:3px; display:inline-block"></span>
+            Tiempo Excedido
+        </span>
+        <span style="display:flex; align-items:center; gap:6px; font-size:13px">
+            <span style="background:#DC2626; width:12px; height:12px; border-radius:3px; display:inline-block"></span>
+            Dañado
+        </span>
+        <span style="color:var(--muted); font-size:12px; margin-left:auto;
+                     display:flex; align-items:center; gap:5px">
+            <i class="fas fa-lightbulb" style="color:var(--warning)"></i>
+            Pasa el mouse para ver detalles • Click para abrir
+        </span>
     </div>
 </div>
 
 <style>
 div:hover > .tooltip-enc { display:block !important; }
 @media (max-width: 768px) {
-    div[style*="min-width:260px"] { min-width: 100% !important; }
+    div[style*="min-width:270px"] { min-width: 100% !important; }
 }
 </style>
 @endsection

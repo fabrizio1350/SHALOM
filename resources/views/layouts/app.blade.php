@@ -53,15 +53,14 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 1px 20px rgba(232,39,42,0.08);
+            box-shadow: 0 2px 20px rgba(232,39,42,0.10);
         }
 
-        /* Línea roja animada arriba del navbar */
         .navbar::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 3px;
+            height: 4px;
             background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
             background-size: 200% auto;
             animation: shimmer 3s linear infinite;
@@ -78,15 +77,17 @@
             text-decoration: none;
         }
         .brand-logo {
-            width: 42px; height: 42px;
+            width: 44px; height: 44px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             box-shadow: 0 4px 12px rgba(232,39,42,0.35);
+            transition: transform 0.2s;
         }
+        .brand-logo:hover { transform: scale(1.05); }
         .brand-text {
             display: flex;
             flex-direction: column;
@@ -105,6 +106,7 @@
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 2px;
         }
 
         .navbar-links {
@@ -124,6 +126,7 @@
             align-items: center;
             gap: 6px;
             white-space: nowrap;
+            position: relative;
         }
         .nav-link:hover {
             background: var(--primary-light);
@@ -131,6 +134,22 @@
             transform: translateY(-1px);
         }
         .nav-link i { font-size: 13px; }
+        .nav-link-active {
+            background: var(--primary-light) !important;
+            color: var(--primary) !important;
+            font-weight: 700;
+        }
+        .nav-link-active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
 
         .navbar-right {
             display: flex;
@@ -183,6 +202,9 @@
             font-family: inherit;
             transition: all 0.18s;
             box-shadow: 0 2px 8px rgba(232,39,42,0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         .btn-logout:hover {
             transform: translateY(-1px);
@@ -316,6 +338,9 @@
             border-left: 4px solid var(--primary);
             font-size: 14px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             animation: slideIn 0.3s ease;
         }
         @keyframes slideIn {
@@ -334,6 +359,7 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
             display: inline-block;
+            white-space: nowrap;
         }
         .badge-recibido        { background:#DBEAFE; color:#1D4ED8; }
         .badge-clasificado     { background:#EDE9FE; color:#5B21B6; }
@@ -386,14 +412,6 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0; right: 0;
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            opacity: 0.06;
-        }
         .stat-number { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
         .stat-label  { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.75; }
         .stat-icon   { font-size: 28px; position: absolute; top: 16px; right: 16px; opacity: 0.2; }
@@ -419,7 +437,9 @@
 @auth
 <nav class="navbar">
     <a href="{{ route('encomiendas.index') }}" class="navbar-brand">
-        <div class="brand-logo">🚚</div>
+        <div class="brand-logo">
+            <i class="fas fa-truck-fast" style="color:white; font-size:20px"></i>
+        </div>
         <div class="brand-text">
             <span class="brand-name">Sha<span>lom</span></span>
             <span class="brand-sub">Sistema de Almacén</span>
@@ -427,30 +447,40 @@
     </a>
 
     <div class="navbar-links">
-        <a href="{{ route('encomiendas.index') }}" class="nav-link">
+        <a href="{{ route('encomiendas.index') }}"
+           class="nav-link {{ request()->routeIs('encomiendas.*') || request()->routeIs('dashboard') ? 'nav-link-active' : '' }}">
             <i class="fas fa-box"></i> Encomiendas
         </a>
+
         @if(auth()->user()->rol === 'supervisor')
-            <a href="{{ route('alertas.index') }}" class="nav-link">
+            <a href="{{ route('alertas.index') }}"
+               class="nav-link {{ request()->routeIs('alertas.*') ? 'nav-link-active' : '' }}">
                 <i class="fas fa-bell"></i> Alertas
             </a>
-            <a href="{{ route('reportes.index') }}" class="nav-link">
+            <a href="{{ route('reportes.index') }}"
+               class="nav-link {{ request()->routeIs('reportes.*') ? 'nav-link-active' : '' }}">
                 <i class="fas fa-chart-bar"></i> Reportes
             </a>
         @endif
+
         @if(auth()->user()->rol === 'administrador')
-            <a href="{{ route('zonas.index') }}" class="nav-link">
+            <a href="{{ route('zonas.index') }}"
+               class="nav-link {{ request()->routeIs('zonas.*') ? 'nav-link-active' : '' }}">
                 <i class="fas fa-warehouse"></i> Zonas
             </a>
-            <a href="{{ route('usuarios.index') }}" class="nav-link">
+            <a href="{{ route('usuarios.index') }}"
+               class="nav-link {{ request()->routeIs('usuarios.*') ? 'nav-link-active' : '' }}">
                 <i class="fas fa-users"></i> Usuarios
             </a>
-            <a href="{{ route('configuracion') }}" class="nav-link">
+            <a href="{{ route('configuracion') }}"
+               class="nav-link {{ request()->routeIs('configuracion*') ? 'nav-link-active' : '' }}">
                 <i class="fas fa-cog"></i> Config
             </a>
         @endif
-        @if(auth()->user()->rol === 'operario' || auth()->user()->rol === 'administrador')
-            <a href="{{ route('almacen') }}" class="nav-link">
+
+        @if(in_array(auth()->user()->rol, ['operario', 'supervisor', 'administrador']))
+            <a href="{{ route('almacen') }}"
+               class="nav-link {{ request()->routeIs('almacen') ? 'nav-link-active' : '' }}">
                 <i class="fas fa-industry"></i> Almacén 2D
             </a>
         @endif
