@@ -45,9 +45,19 @@ class ZonaController extends Controller
     {
         $zona = Zona::findOrFail($id);
 
-        // Si está eliminada no se puede cambiar
         if ($zona->estado === 'eliminada') {
-            return redirect()->route('zonas.index')->with('error', 'La zona ya está eliminada.');
+            return redirect()->route('zonas.index')
+                ->with('error', 'La zona ya está eliminada.');
+        }
+
+        // Verificar si tiene encomiendas activas
+        $encomiendas = $zona->encomiendas()
+            ->where('estado', '!=', 'despachado')
+            ->count();
+
+        if ($encomiendas > 0) {
+            return redirect()->route('zonas.index')
+                ->with('error', "No se puede eliminar la zona. Tiene {$encomiendas} encomienda(s) activa(s).");
         }
 
         $zona->estado = 'eliminada';
@@ -55,23 +65,21 @@ class ZonaController extends Controller
 
         return redirect()->route('zonas.index')->with('success', 'Zona eliminada correctamente.');
     }
-        // Vista 2D del almacen
+
+    // Vista 2D del almacen
     public function almacen()
     {
-        // Usar función PL/pgSQL que consulta arbol_almacen con WITH RECURSIVE
         $nodos = DB::select('SELECT * FROM obtener_arbol_almacen()');
 
         $tree        = new \App\DataStructures\ClasificacionTree();
         $almacenTree = new \App\DataStructures\AlmacenTree();
 
-        // Obtener datos completos de zonas para el AlmacenTree
         $zonasCompletas = \App\Models\Zona::where('estado', '!=', 'eliminada')
                             ->with(['encomiendas' => function($q) {
                                 $q->where('estado', '!=', 'despachado');
                             }])
                             ->get();
 
-        // Construir árbol con AlmacenTree
         foreach ($zonasCompletas as $zona) {
             $almacenTree->agregarZona($zona->toArray());
             foreach ($zona->encomiendas as $enc) {
@@ -81,7 +89,7 @@ class ZonaController extends Controller
         }
 
         $arbol      = $almacenTree->getTree();
-        $totalNodos = count($nodos); // Total de nodos del árbol SQL
+        $totalNodos = count($nodos);
 
         return view('zonas.almacen', compact('arbol', 'totalNodos'));
     }
