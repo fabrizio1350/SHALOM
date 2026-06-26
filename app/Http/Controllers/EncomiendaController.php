@@ -58,7 +58,7 @@ class EncomiendaController extends Controller
             'remitente.regex'   => 'El remitente solo puede contener letras.',
             'destinatario.regex'=> 'El destinatario solo puede contener letras.',
             'ciudad_destino.in' => 'Selecciona una ciudad válida.',
-            'peso.min'          => 'El peso mínimo es 5 kg.',
+            'peso.min'          => 'El peso mínimo es 0.1 kg.',
             'peso.max'          => 'El peso máximo es 70 kg.',
             'dimensiones.regex' => 'Las dimensiones deben tener formato LxAxH (ej: 30x20x15).',
             'imagen.mimes'      => 'Solo se permiten imágenes JPG o PNG.',

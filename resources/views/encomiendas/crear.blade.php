@@ -85,7 +85,7 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
                 <div class="form-group" style="margin-bottom:0">
                     <label>Peso (kg)</label>
-                    <input type="number" name="peso" step="0.01" min="1" max="70"
+                    <input type="number" name="peso" step="0.01" min="0.1" max="70"
                            value="{{ old('peso') }}" placeholder="Ej: 5.5" required>
                     <small style="color:#888; font-size:11px">Máximo 70 kg</small>
                 </div>
